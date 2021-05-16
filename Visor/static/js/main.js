@@ -287,7 +287,7 @@ d3.select("#slider-knob")
 d3.select("#button-reload").on("click", function () {
   if (vars.refreshing == null) {
     console.log("Refreshing initiated");
-    vars.refreshing = setInterval(loadData, 1000 * 5); // Every 5 seconds
+    vars.refreshing = setInterval(loadData, 1000 * 3); // Every 5 seconds
     d3.select("#button-reload").classed("button-reload-on", true);
   } else {
     console.log("Refreshing aborted");
@@ -296,24 +296,3 @@ d3.select("#button-reload").on("click", function () {
     d3.select("#button-reload").classed("button-reload-on", false);
   }
 });
-
-// // Refreshing
-
-// d3.select("#button-refresh").on("click", () => refresh());
-
-// // keep refreshing
-// {
-//   let keepRefreshing = null;
-//   d3.select("#keepRefreshing").on("click", function () {
-//     if (keepRefreshing == null) {
-//       console.log("Refreshing initiated.");
-//       keepRefreshing = setInterval(refresh, 1000 * 10);
-//       d3.select(this).classed("buttonOn", true);
-//     } else {
-//       console.log("Refreshing aborted.");
-//       clearInterval(keepRefreshing);
-//       keepRefreshing = null;
-//       d3.select(this).classed("buttonOn", false);
-//     }
-//   });
-// }
