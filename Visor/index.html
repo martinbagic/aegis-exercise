@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <link rel="stylesheet" href="static/css/styles.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;800&display=swap" rel="stylesheet">
+    <title>AEGIS Visor</title>
+
+</head>
+
+<body>
+    <h1>AEGIS Visor</h1>
+
+    <!-- <div class="panel" id="panel-display">
+        <div id="button-refresh" class="button" state="inactive">Refresh</div>
+        <div id="color-schemes"></div>
+    </div> -->
+
+    <div id="panel-container">
+
+        <div class="panel" id="panel-loading">
+            <input id="json-file" type="text" value="default_jobid.json" />
+            <div id="button-load" class="button">Load</div>
+            <div id="button-reload" class="button">Refresh</div>
+        </div>
+        <div class="panel" id="panel-stats">
+            <!-- <p>Statistics</p> -->
+            <div id="stats-value" class="stats button">value</div>
+            <div id="stats-age" class="stats button">age</div>
+            <div id="stats-bit" class="stats button">bit</div>
+            <div id="stats-stage" class="stats button">stage</div>
+        </div>
+
+        <div class="panel" id="panel-bars">
+            <div class="button button-bars" affect="age_at_birth">Reproduction distribution</div>
+            <div class="button button-bars" affect="age_at_overshoot">Ecological death distribution</div>
+            <div class="button button-bars" affect="age_at_genetic">Genetic death distribution</div>
+            <div class="button button-bars" affect="cumulative_ages">Survivorship</div>
+        </div>
+
+    </div>
+
+    <div class="panel" id="panel-slider">
+        <div id="slider-knob" class="button"></div>
+    </div>
+
+    <div class="panel" id="panel-plots">
+        <svg id="tile-field">
+            <g id="gensurv"></g>
+            <g id="phesurv"></g>
+            <g id="pherepr"></g>
+            <g id="genrepr"></g>
+            <g class="bars-toggle" id="age_at_birth"></g>
+            <g class="bars-toggle" id="age_at_overshoot"></g>
+            <g class="bars-toggle" id="age_at_genetic"></g>
+            <g class="bars-toggle" id="cumulative_ages"></g>
+        </svg>
+    </div>
+
+
+
+
+</body>
+
+<script src="static/js/functions.js"></script>
+<script src="static/js/main.js"></script>
+
+</html>

@@ -1,0 +1,47 @@
+# ECOLOGY
+MAX_POPULATION_SIZE: 300 # 1+ | Number of individuals in the population
+OVERSHOOT_EVENT: starvation # starvation, cliff, treadmill_random, treadmill_zoomer, treadmill_boomer | Who dies when everyone is starving?
+CLIFF_SURVIVORSHIP: False # False or real number in (0,1) | What fraction of population survives after a cliff?
+DISCRETE_GENERATIONS: False # False or integer | How many stages does one season last?
+
+# GENOTYPE
+MAX_LIFESPAN: 50 # 1+ | Maximum lifespan
+MATURATION_AGE: 10 # 1+ | Age at which reproduction is possible
+BITS_PER_LOCUS: 8 # 1+ | Number of bits that each locus has
+HEADSUP: -1 # -1, 0, 1+ |-1 if no preevolution, 0 for maturity guarantee, +x for headsup
+
+# GENOME STRUCTURE
+# agespecific, interpreter, bound low, bound high, initial value
+GENOME_STRUCT:
+  surv: [true, binary, 0, 1, 1]
+  repr: [true, binary, 0, 0.5, 1]
+
+GENOME_CONST:
+  neut: 1
+  muta: 0.001
+
+# REPRODUCTION
+REPR_MODE: asexual # sexual, asexual | Reproduction mode
+RECOMBINATION_RATE: False # True, False | Is recombination possible?
+
+# MUTATION
+MUTATION_RATIO: 0.1 # real (0,+inf) | Ratio of beneficial mutations to detrimental mutations
+
+# RUNTIME
+CYCLE_NUM: 1000000 # 1+ | How many stages does the simulation run for?
+LOGGING_RATE: 500 # 1+ | Log every ?-th stage
+
+# RECORDING
+REC_EVERY_NTH: 1 # 1+ | Record every ?-th individual
+FLUSH_RATE: 20000 # 1+ | Flush once ? individuals have been saved
+JSON_RATE: 2000 # 1+ | Record json every ? stages
+REC_RATE: 10 # 1+ | Record gen, phe, dem every ? JSON flushes
+PICKLE_RATE: 250000 # 1+ | Pickle population every ? stages
+COUNTER_RATE: 500 # 1+ | Record statistics every ? stages
+
+# PHENOMAP
+PHENOMAP_PLUS: [] # | Specification of pleiotropic effects | [[geno index, pheno index, weight], ...]
+
+# ENVMAP
+ENVMAP_RATE: 0 # -+ | Environmental map changes every ? stages
+

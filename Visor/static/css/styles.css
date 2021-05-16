@@ -1,0 +1,228 @@
+:root {
+    --white: #ffffff;
+    --pink: rgb(255, 130, 205);
+    --lpink: rgb(255, 157, 225);
+    --dpink: rgb(255, 66, 198);
+    --orange: rgb(255, 186, 96);
+    --lorange: rgb(255, 203, 134);
+    --violet: rgb(151, 107, 255);
+    --lviolet: rgb(175, 140, 255);
+    --dblue: rgb(23, 119, 216);
+    --blue: rgb(30, 144, 255);
+    --lblue: rgb(89, 172, 255);
+    --llblue: rgb(173, 214, 255);
+    --lgreen: rgb(59, 236, 133);
+    --green: rgb(24, 180, 89);
+    --dgray: rgb(10, 10, 10);
+    --red: rgb(241, 56, 0);
+    --lred: rgb(233, 81, 61);
+}
+
+body {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+h1 {
+    font-weight: 900;
+    color: rgb(50, 50, 50)
+}
+
+#panel-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.panel {
+    margin: 1rem;
+    /* padding: 0; */
+    padding: 0.5rem;
+    border-radius: 0.8rem;
+    min-height: 36px;
+    /* box-shadow: 0 0 5px rgba(145, 164, 201, 0.2), 0 0 15px rgba(145, 164, 201, 0.1); */
+    display: flex;
+    flex-direction: row;
+}
+
+#panel-loading {
+    background-image: linear-gradient(70deg, rgb(242, 255, 211), rgb(255, 255, 169));
+}
+
+#panel-display {
+    background-image: linear-gradient(70deg, rgb(220, 206, 255), rgb(210, 235, 223));
+}
+
+#panel-stats {
+    background-image: linear-gradient(70deg, rgb(173, 214, 255), rgb(173, 243, 255));
+}
+
+#panel-slider {
+    background-color: lightgray;
+}
+
+#panel-bars {
+    background-image: linear-gradient(70deg, rgb(255, 199, 209), rgb(255, 188, 167));
+}
+
+.button {
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.5rem;
+    min-height: 1rem;
+    margin: 0.2rem;
+    color: white;
+    /* font-weight: bold; */
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: background-color 250ms ease-out;
+    background-color: var(--bgc);
+    white-space: nowrap;
+}
+
+.button:hover {
+    box-shadow: 0 0 0.3rem var(--hover-c);
+    background-color: var(--hover-c);
+    background-image: none;
+}
+
+.button-pressed {
+    background-color: lightgray;
+}
+
+#button-load {
+    --bgc: var(--lorange);
+    --hover-c: var(--orange);
+}
+
+#button-reload {
+    --bgc: var(--lorange);
+    --hover-c: var(--orange);
+    /* margin-left: 1rem; */
+}
+
+.button-reload-on {
+    /* --bgc: var(--lviolet) !important;
+    box-shadow: 0 0 0.3rem var(--bgc);
+    --hover-c: var(--violet) !important */
+    background-color: #222;
+    animation-name: color;
+    animation-duration: 5s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes color {
+    0% {
+        background-color: var(--red);
+    }
+    25% {
+        background-color: var(--blue);
+    }
+    50% {
+        background-color: var(--green);
+    }
+    75% {
+        background-color: var(--lorange);
+    }
+    100% {
+        background-color: var(--red);
+    }
+}
+
+/* PANEL LOADING */
+
+input#json-file {
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.5rem;
+    height: 1rem;
+    margin: 0.2rem;
+    box-shadow: none;
+    border: 2px solid white;
+    font-weight: bold;
+}
+
+input#json-file:focus {
+    outline-color: var(--lpink);
+    outline-width: 0;
+    /* outline-width: 3px; */
+    /* outline-style: dotted; */
+}
+
+/* PANEL SLIDER */
+
+#panel-slider {
+    position: relative;
+}
+
+#slider-knob {
+    position: absolute;
+    background-color: darkgray;
+    left: 8px;
+}
+
+#slider-knob:active {
+    background-color: rgb(126, 126, 126);
+    box-shadow: 0 0 0.3rem darkgray;
+}
+
+/* PANEL STATS */
+
+.stats {
+    width: 4rem;
+    text-align: center;
+    --bgc: var(--lblue);
+    --hover-c: var(--blue);
+}
+
+/* #stats-value, #stats-age, #stats-bit {
+    --bgc: var(--lblue);
+    --hover-c: var(--blue);
+} */
+
+#stats-stage {
+    margin-left: 1rem;
+    --bgc: gray;
+    --hover-c: darkgray;
+}
+
+/* PANEL BARS */
+
+.button-bars {
+    --bgc: var(--lpink);
+    --hover-c: var(--pink)
+}
+
+.button-bars-active {
+    --bgc: var(--dpink);
+    --hover-c: var(--pink)
+}
+
+/* PANEL PLOTS */
+
+#panel-plots {
+    display: flex;
+    justify-content: center;
+}
+
+/* PLOTS */
+
+rect.heat-tile {
+    cursor: pointer;
+    rx: 15;
+}
+
+rect.heat-tile:hover {
+    rx: 3;
+}
+
+rect.bar {
+    cursor: pointer;
+    rx: 3;
+}
+
+rect.bar:hover {
+    rx: 1;
+}
