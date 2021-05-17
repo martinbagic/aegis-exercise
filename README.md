@@ -143,7 +143,7 @@ Open another terminal in the same folder. To use the visualization tool, run in 
 - `python3 -m http.server --directory Visor/` (macOS & Linux)
 - `py -3 -m http.server --directory Visor/` (Windows)
 
-Open a browser of choice (e.g. Chrome) and write into URL bar `http://localhost:8000/`
+Open a browser of choice (e.g. Chrome) and write into URL bar `http://localhost:8000/` (or 192.168.X.X:8000 or 127.0.0.1:8000)
 
 ## Explore
 
