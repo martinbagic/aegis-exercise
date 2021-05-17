@@ -41,7 +41,7 @@
 
 ### V. Test AEGIS
 
-1. Run: `python3 main.py -h`
+1. Run: `python3 aegis.py -h`
    - If it returns information about the **usage**, **positional arguments**, **optional arguments** and others, you can proceed with the next part (**How to run AEGIS**).
    - If it returns **No such file or directory**, check if you are in the correct directory (run `cd ~/Desktop/aegis-exercise/`) and try again.
    - If it returns **ModuleNotFoundError**, check that your virtual environment is activated (run `. venv/bin/activate`) and try again.
@@ -103,7 +103,7 @@
 
 ### V. Test AEGIS
 
-1. Run: `py -3 main.py -h`
+1. Run: `py -3 aegis.py -h`
    - If it returns information about the **usage**, **positional arguments**, **optional arguments** and others, you can proceed with the next part (**How to run AEGIS**).
    - If it returns **No such file or directory**, check if you are in the correct directory (`?:\Users\?\Desktop\aegis-exercise` where first ? is your disk, and the second ? your username) and try again.
    - If it returns **ModuleNotFoundError**, check that your virtual environment is activated (run `.\venv\Scripts\activate`) and try again.
