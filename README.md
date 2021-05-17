@@ -20,14 +20,14 @@
 
 ### II. Download AEGIS
 
-1. Go to www.github.com/
+1. Go to www.github.com/martinbagic/aegis-exercise
 1. Click on the green button **Code**.
 1. Click on **Download ZIP**.
 1. Move the downloaded folder to desktop.
 
 ### III. Navigate to the working directory
 
-1. Run: `cd ~/Desktop/wxyz-master/`
+1. Run: `cd ~/Desktop/aegis-exercise/`
    - If you ever close the terminal, always run this command to return to the working directory.
 
 ### IV. Install dependencies in a [virtual environment](https://docs.python.org/3/tutorial/venv.html)
@@ -43,7 +43,7 @@
 
 1. Run: `python3 main.py -h`
    - If it returns information about the **usage**, **positional arguments**, **optional arguments** and others, you can proceed with the next part (**How to run AEGIS**).
-   - If it returns **No such file or directory**, check if you are in the correct directory (run `cd ~/Desktop/wxyz-master/`) and try again.
+   - If it returns **No such file or directory**, check if you are in the correct directory (run `cd ~/Desktop/aegis-exercise/`) and try again.
    - If it returns **ModuleNotFoundError**, check that your virtual environment is activated (run `. venv/bin/activate`) and try again.
 
 </details>
@@ -77,7 +77,7 @@
 
 ### II. Download AEGIS
 
-1. Go to www.github.com/
+1. Go to www.github.com/martinbagic/aegis-exercise
 1. Click on the green button **Code**.
 1. Click on **Download ZIP**.
 1. Move the downloaded folder to desktop.
@@ -85,10 +85,8 @@
 
 ### III. Navigate to the working directory
 
-<!-- change wxyz-master to the actual repo -->
-
-1. Run: `cd wxyz-master`
-   - Your command line path should be **?:\Users\\?\Desktop\wxyz-master**
+1. Run: `cd aegis-exercise`
+   - Your command line path should be **?:\Users\\?\Desktop\aegis-exercise**
 
 ### IV. Install dependencies in a [virtual environment](https://docs.python.org/3/tutorial/venv.html)
 
@@ -107,7 +105,7 @@
 
 1. Run: `py -3 main.py -h`
    - If it returns information about the **usage**, **positional arguments**, **optional arguments** and others, you can proceed with the next part (**How to run AEGIS**).
-   - If it returns **No such file or directory**, check if you are in the correct directory (`?:\Users\?\Desktop\wxyz-master` where first ? is your disk, and the second ? your username) and try again.
+   - If it returns **No such file or directory**, check if you are in the correct directory (`?:\Users\?\Desktop\aegis-exercise` where first ? is your disk, and the second ? your username) and try again.
    - If it returns **ModuleNotFoundError**, check that your virtual environment is activated (run `.\venv\Scripts\activate`) and try again.
 
 </details>
