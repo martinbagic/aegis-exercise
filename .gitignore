@@ -6,6 +6,7 @@ Makefile
 Visor/json
 visor
 output
+temp
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

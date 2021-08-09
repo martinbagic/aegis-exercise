@@ -18,16 +18,15 @@ class Biosystem:
             genomes = np.random.random(
                 size=(
                     self.conf.MAX_POPULATION_SIZE,
-                    self.conf.total_loci,
+                    self.conf.gstruc.length,
                     self.conf.BITS_PER_LOCUS,
                 )
             )
 
-            # Make a bool map using the initial values from GENOME_STRUCT
-            for attr, pos in self.conf.loci_pos.items():
-                initial_value = self.conf.GENOME_STRUCT[attr][4]
-                genomes[:, pos[0] : pos[1]] = (
-                    genomes[:, pos[0] : pos[1]] <= initial_value
+            # Make a bool map using the initial values from Traits
+            for trait in self.conf.gstruc.evolvable:
+                genomes[:, trait.slice] = (
+                    trait.cut(genomes) <= trait.initial
                 )
 
             genomes = genomes.astype(bool)
@@ -35,16 +34,10 @@ class Biosystem:
             # Guarantee survival and reproduction values up to first few mature ages
             if self.conf.HEADSUP > -1:
                 headsup = self.conf.MATURATION_AGE + self.conf.HEADSUP
-                surv_start = self.conf.loci_pos["surv"][0]
-                repr_start = self.conf.loci_pos["repr"][0]
-                genomes[
-                    :,
-                    surv_start : surv_start + headsup,
-                ] = True
-                genomes[
-                    :,
-                    repr_start : repr_start + headsup,
-                ] = True
+                surv_start = self.conf.gstruc.surv.start
+                repr_start = self.conf.gstruc.repr.start
+                genomes[:, surv_start : surv_start + headsup] = True
+                genomes[:, repr_start : repr_start + headsup] = True
 
             return genomes
 
@@ -302,24 +295,23 @@ class Biosystem:
             """Interpret genomes"""
             interpretome = np.zeros(shape=omes.shape[:2])
 
-            for attr, pos in self.conf.loci_pos.items():
+            for trait in self.conf.gstruc.evolvable:
                 # fetch
-                loci = omes[:, pos[0] : pos[1]]
-                interpreter = self.conf.GENOME_STRUCT[attr][1]
+                loci = trait.cut(omes)
 
                 # interpret
-                probs = self.conf.interpreter(loci, interpreter)  # * (hi - lo) + lo
+                probs = self.conf.interpreter(loci, trait.interpreter)
 
                 # add back
-                interpretome[:, pos[0] : pos[1]] += probs
+                interpretome[:, trait.slice] += probs
 
             return interpretome
 
         def _bound(omes):
             """Impose lower and upper bounds for genetically encodable attributes."""
-            for attr, pos in self.conf.loci_pos.items():
-                lo, hi = self.conf.GENOME_STRUCT[attr][2:4]
-                omes[:, pos[0] : pos[1]] = omes[:, pos[0] : pos[1]] * (hi - lo) + lo
+            for trait in self.conf.gstruc.evolvable:
+                lo, hi = trait.lo, trait.hi
+                omes[:, trait.slice] = trait.cut(omes) * (hi - lo) + lo
             return omes
 
         envgenomes = self.conf.envmap(genomes)
@@ -336,15 +328,14 @@ class Biosystem:
             which_individuals = which_individuals[part]
 
         # first scenario
-        if attr in self.conf.GENOME_CONST:
-            probs = self.conf.GENOME_CONST[attr]
+        trait = self.conf.gstruc[attr]
+        if not trait.evolvable:
+            probs = trait.initial
 
         # second and third scenario
-        if attr in self.conf.GENOME_STRUCT:
-            agespec = self.conf.GENOME_STRUCT[attr][0]
-
-            which_loci = self.conf.loci_pos[attr][0]
-            if agespec:
+        if trait.evolvable:
+            which_loci = trait.start
+            if trait.agespec:
                 which_loci += self.pop.ages[which_individuals]
 
             probs = self.pop.phenotypes[which_individuals, which_loci]

@@ -24,7 +24,7 @@ class Recorder:
         self,
         opath,
         params,
-        LOCI_POS,
+        gstruc,
         BITS_PER_LOCUS,
         MATURATION_AGE,
     ):
@@ -44,7 +44,8 @@ class Recorder:
         self.JSON_RATE = params["JSON_RATE"]
         self.REC_RATE = params["REC_RATE"]
 
-        self.LOCI_POS = LOCI_POS
+        self.gstruc = gstruc
+
         self.BITS_PER_LOCUS = BITS_PER_LOCUS
         self.opath = opath
 
@@ -64,8 +65,8 @@ class Recorder:
 
         self.visor_data = {
             "bitsperlocus": self.BITS_PER_LOCUS,
-            "survloc": self.LOCI_POS["surv"],
-            "reprloc": self.LOCI_POS["repr"],
+            "survloc": (self.gstruc.surv.start, self.gstruc.surv.end),
+            "reprloc": (self.gstruc.repr.start, self.gstruc.repr.end),
             "lifespan": self.MAX_LIFESPAN,
             "maturationage": MATURATION_AGE,
             "gensurv": [],
@@ -140,8 +141,12 @@ class Recorder:
 
     def record_for_visor(self, gen, phe, dem):
         def get_bits(loci_kind, array, bitsperlocus=self.BITS_PER_LOCUS):
-            pos = self.LOCI_POS[loci_kind]
-            return array.iloc[:, pos[0] * bitsperlocus : pos[1] * bitsperlocus]
+            return array.iloc[
+                :,
+                self.gstruc[loci_kind].start
+                * bitsperlocus : self.gstruc[loci_kind].start
+                * bitsperlocus,
+            ]
 
         def get_deaths(death_kind):
             deaths = dem[dem.causeofdeath == death_kind].age.value_counts()
@@ -170,7 +175,7 @@ class Recorder:
 
     def pickle_pop(self, obj, stage):
         """Pickle given population"""
-        logging.info(f"Pickling the population at stage {stage}.")
+        logging.debug(f"Pickling the population at stage {stage}.")
         path = self.opath / f"{stage}.pickle"
         with open(path, "wb") as ofile:
             pickle.dump(obj, ofile)
@@ -188,13 +193,13 @@ class Recorder:
 
 
 class Counter:
-    def __init__(self, opath, maxlifespan, rate, loci_pos):
+    def __init__(self, opath, maxlifespan, rate, gstruc):
         self.opath = opath.parents[1] / "Visor" / "counter" / f"{opath.stem}.json"
         (self.opath.parent).mkdir(exist_ok=True)
 
         self.maxlifespan = maxlifespan
         self.rate = rate
-        self.loci_pos = loci_pos
+        self.gstruc = gstruc
 
         self.reinit()
 
@@ -206,6 +211,7 @@ class Counter:
             "age_at_overshoot": [0] * self.maxlifespan,
             "age_at_genetic": [0] * self.maxlifespan,
             "cumulative_ages": [0] * self.maxlifespan,
+            "age_at_end_of_sim": [0] * self.maxlifespan,
         }
 
     def count(self, data_key, ages):
@@ -217,34 +223,20 @@ class Counter:
 
     def process_pop(self, pop):
 
+        # Generalize to situations when repr is not evolvable and other traits are evolvable
+
         self.data["gensurv"] = (
-            pop.genomes[:, self.loci_pos["surv"][0] : self.loci_pos["surv"][1]]
-            .mean(0)
-            .astype(float)
-            .tolist()
+            self.gstruc.surv.cut(pop.genomes).mean(0).astype(float).tolist()
         )
         self.data["genrepr"] = (
-            pop.genomes[:, self.loci_pos["repr"][0] : self.loci_pos["repr"][1]]
-            .mean(0)
-            .astype(float)
-            .tolist()
+            self.gstruc.repr.cut(pop.genomes).mean(0).astype(float).tolist()
         )
 
         self.data["phesurv"] = (
-            np.median(
-                pop.phenotypes[:, self.loci_pos["surv"][0] : self.loci_pos["surv"][1]],
-                0,
-            )
-            .astype(float)
-            .tolist()
+            np.median(self.gstruc.surv.cut(pop.phenotypes), 0).astype(float).tolist()
         )
         self.data["pherepr"] = (
-            np.median(
-                pop.phenotypes[:, self.loci_pos["repr"][0] : self.loci_pos["repr"][1]],
-                0,
-            )
-            .astype(float)
-            .tolist()
+            np.median(self.gstruc.repr.cut(pop.phenotypes), 0).astype(float).tolist()
         )
 
     def flush(self, pop):

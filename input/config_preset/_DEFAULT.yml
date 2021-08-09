@@ -11,14 +11,32 @@ BITS_PER_LOCUS: 8 # 1+ | Number of bits that each locus has
 HEADSUP: -1 # -1, 0, 1+ |-1 if no preevolution, 0 for maturity guarantee, +x for headsup
 
 # GENOME STRUCTURE
-# agespecific, interpreter, bound low, bound high, initial value
-GENOME_STRUCT:
-  surv: [true, binary, 0, 1, 1]
-  repr: [true, binary, 0, 0.5, 1]
+# G_trait_agespec: # true, false | Is the trait age specific?
+# G_trait_interpreter: # binary, uniform, ... | Interpreter to decode genome
+# G_trait_lo: # 0-1 | The minimum phenotypic value
+# G_trait_hi: # 0-1 | The maximum phenotypic value
+# G_trait_initial: # 0-1 | The fraction of bits that are 1 in the newly initialized population
+# G_trait_evol: # | The value of an non-evolvable trait
 
-GENOME_CONST:
-  neut: 1
-  muta: 0.001
+G_surv_evolvable: true
+G_surv_agespec: true
+G_surv_interpreter: binary
+G_surv_lo: 0
+G_surv_hi: 1
+G_surv_initial: 1
+
+G_repr_evolvable: true
+G_repr_agespec: true
+G_repr_interpreter: binary
+G_repr_lo: 0
+G_repr_hi: 0.5
+G_repr_initial: 1
+
+G_neut_evolvable: false
+G_neut_initial: 1
+
+G_muta_evolvable: false
+G_muta_initial: 0.001
 
 # REPRODUCTION
 REPR_MODE: asexual # sexual, asexual | Reproduction mode
@@ -45,3 +63,5 @@ PHENOMAP_PLUS: [] # | Specification of pleiotropic effects | [[geno index, pheno
 # ENVMAP
 ENVMAP_RATE: 0 # -+ | Environmental map changes every ? stages
 
+# MULTIPLE BIOSYSTEMS
+BIOSYSTEM_NUMBER: 1

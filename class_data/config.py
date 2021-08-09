@@ -5,9 +5,11 @@ from class_logic.overshoot import Overshoot
 from class_logic.envmap import Envmap, EnvmapFake
 from class_logic.season import Season
 
+from class_data.gstruc import Gstruc, Trait
+
 
 class Config:
-    """Wrapper for all configuration parameters"""
+    """Wrapper for biosystem-specific parameters"""
 
     def __init__(self, params):
 
@@ -16,8 +18,6 @@ class Config:
         self.MATURATION_AGE = params["MATURATION_AGE"]
         self.BITS_PER_LOCUS = params["BITS_PER_LOCUS"]
         self.HEADSUP = params["HEADSUP"]
-        self.GENOME_STRUCT = params["GENOME_STRUCT"]
-        self.GENOME_CONST = params["GENOME_CONST"]
         self.REPR_MODE = params["REPR_MODE"]
         self.MUTATION_RATIO = params["MUTATION_RATIO"]
         self.RECOMBINATION_RATE = params["RECOMBINATION_RATE"]
@@ -30,17 +30,10 @@ class Config:
         self.PHENOMAP_PLUS = params["PHENOMAP_PLUS"]
         self.CLIFF_SURVIVORSHIP = params["CLIFF_SURVIVORSHIP"]
 
-        # Derived parameters
-        self.loci_n = {
-            attr: [1, self.MAX_LIFESPAN][vals[0]]
-            for attr, vals in self.GENOME_STRUCT.items()
-        }  # Which loci correspond to which traits
-        loci_pos = [0] + np.cumsum(list(self.loci_n.values())).tolist()
-        self.loci_pos = {
-            attr: (loci_pos[i], loci_pos[i + 1])
-            for i, attr in enumerate(self.GENOME_STRUCT)
-        }  # First and last+1 loci of each trait
-        self.total_loci = loci_pos[-1]  # Total number of loci
+        # Genome structure
+        self.gstruc = Gstruc(
+            traits=[Trait(name, params) for name in ["surv", "repr", "neut", "muta"]]
+        )
 
         # Simulation variables
         self.max_uid = 0  # ID of the most recently born individual
@@ -56,7 +49,7 @@ class Config:
 
         # Phenomap
         self.phenomap = (
-            Phenomap(PHENOMAP_PLUS=self.PHENOMAP_PLUS, pos_end=self.total_loci)
+            Phenomap(PHENOMAP_PLUS=self.PHENOMAP_PLUS, pos_end=Trait.genome_length)
             if self.PHENOMAP_PLUS != []
             else PhenomapFake()
         )
@@ -72,7 +65,7 @@ class Config:
         self.envmap = (
             Envmap(
                 BITS_PER_LOCUS=self.BITS_PER_LOCUS,
-                total_loci=self.total_loci,
+                total_loci=Trait.genome_length,
                 ENVMAP_RATE=self.ENVMAP_RATE,
             )
             if self.ENVMAP_RATE > 0
