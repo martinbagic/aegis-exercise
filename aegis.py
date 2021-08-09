@@ -33,8 +33,8 @@ class Main:
     def __call__(self):
         """List of all steps to perform"""
         args = self.get_args()
-        self.recpath = self.getmake_recpath(args.jobid)
-        self.auxi = self.get_auxi(args.config_files, args.params_extra)
+        recpath = self.getmake_recpath(args.jobid)
+        self.auxi = self.get_auxi(args.config_files, args.params_extra, recpath)
         self.biosystem = self.get_biosystem(args.reload_biosystem)
         self.start_simulation()
         self.run_simulation()
@@ -56,10 +56,22 @@ class Main:
 
         return args
 
-    def get_auxi(self, args_config_files, args_params_extra):
+    def getmake_recpath(self, args_jobid):
+        """Make folder for recording experiments and return its path"""
+        recpath = self.project_path / "output" / args_jobid
+        i = 1
+        while recpath.is_dir():
+            recpath = self.project_path / "output" / (args_jobid + f"^{i}")
+            i += 1
+        recpath.mkdir(parents=True, exist_ok=True)  # make folder for experiment
+        return recpath
+
+    def get_auxi(self, args_config_files, args_params_extra, recpath):
         """Initialize Auxi"""
 
-        def find_config_file(cfile, ):
+        def find_config_file(
+            cfile,
+        ):
             if (self.project_path / "input" / "config_preset" / cfile).is_file():
                 return self.project_path / "input" / "config_preset" / cfile
             elif (self.project_path / "input" / "config_custom" / cfile).is_file():
@@ -72,19 +84,9 @@ class Main:
                 for cfile in args_config_files
             ],
             cmd_params=json.loads(args_params_extra),
-            recpath=self.recpath,
+            recpath=recpath,
         )
         return auxi
-
-    def getmake_recpath(self, args_jobid):
-        """Make folder for recording experiments and return its path"""
-        recpath = self.project_path / "output" / args_jobid
-        i = 1
-        while recpath.is_dir():
-            recpath = self.project_path / "output" / (args_jobid + f"^{i}")
-            i += 1
-        recpath.mkdir(parents=True, exist_ok=True)  # make folder for experiment
-        return recpath
 
     def get_biosystem(self, args_reload_biosystem):
         """Initialize biosystem"""
