@@ -32,15 +32,15 @@ class Main:
 
     def __call__(self):
         """List of all steps to perform"""
-        self.set_args()
-        self.recpath = self.getmake_recpath()
-        self.auxi = self.get_auxi()
-        self.biosystem = self.get_biosystem()
+        args = self.get_args()
+        self.recpath = self.getmake_recpath(args.jobid)
+        self.auxi = self.get_auxi(args.config_files, args.params_extra)
+        self.biosystem = self.get_biosystem(args.reload_biosystem)
         self.start_simulation()
         self.run_simulation()
         self.end_simulation()
 
-    def set_args(self):
+    def get_args(self):
         """Parse and save terminal arguments"""
         parser = argparse.ArgumentParser("Job")
         parser.add_argument("--params_extra", type=str, default="{}")
@@ -53,14 +53,13 @@ class Main:
         args.config_files.append("_DEFAULT.yml")
         if args.jobid == "":
             args.jobid = args.config_files[0][:-4]
-        print(args)
 
-        self.args = args
+        return args
 
-    def get_auxi(self):
+    def get_auxi(self, args_config_files, args_params_extra):
         """Initialize Auxi"""
 
-        def find_config_file(cfile):
+        def find_config_file(cfile, ):
             if (self.project_path / "input" / "config_preset" / cfile).is_file():
                 return self.project_path / "input" / "config_preset" / cfile
             elif (self.project_path / "input" / "config_custom" / cfile).is_file():
@@ -70,30 +69,30 @@ class Main:
             paths_config=[
                 find_config_file(cfile)
                 # self.project_path / "configs" / cfile
-                for cfile in self.args.config_files
+                for cfile in args_config_files
             ],
-            cmd_params=json.loads(self.args.params_extra),
+            cmd_params=json.loads(args_params_extra),
             recpath=self.recpath,
         )
         return auxi
 
-    def getmake_recpath(self):
+    def getmake_recpath(self, args_jobid):
         """Make folder for recording experiments and return its path"""
-        recpath = self.project_path / "output" / self.args.jobid
+        recpath = self.project_path / "output" / args_jobid
         i = 1
         while recpath.is_dir():
-            recpath = self.project_path / "output" / (self.args.jobid + f"^{i}")
+            recpath = self.project_path / "output" / (args_jobid + f"^{i}")
             i += 1
         recpath.mkdir(parents=True, exist_ok=True)  # make folder for experiment
         return recpath
 
-    def get_biosystem(self):
+    def get_biosystem(self, args_reload_biosystem):
         """Initialize biosystem"""
 
-        if self.args.reload_biosystem:
-            logging.info(f"Reloading biosystem from: {self.args.reload_biosystem}")
+        if args_reload_biosystem:
+            logging.info(f"Reloading biosystem from: {args_reload_biosystem}")
             with open(
-                self.project_path / "output" / self.args.reload_biosystem, "rb"
+                self.project_path / "output" / args_reload_biosystem, "rb"
             ) as ifile:
                 pop = pickle.load(ifile).pop
                 biosystem = Biosystem(pop=pop, auxi=self.auxi)
