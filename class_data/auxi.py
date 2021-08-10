@@ -21,7 +21,7 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
-default_args = {
+DEFAULT_ARGS = {
     "params_extra": "{}",
     "jobid": "",
     "reload_biosystem": False,
@@ -47,25 +47,25 @@ class Auxi:
                 # Fetch arguments
                 parser = argparse.ArgumentParser()
                 parser.add_argument(
-                    "--params_extra", type=str, default=default_args["params_extra"]
+                    "--params_extra", type=str, default=DEFAULT_ARGS["params_extra"]
                 )
-                parser.add_argument("--jobid", type=str, default=default_args["jobid"])
+                parser.add_argument("--jobid", type=str, default=DEFAULT_ARGS["jobid"])
                 parser.add_argument(
                     "-r",
                     "--reload_biosystem",
                     type=str,
-                    default=default_args["reload_biosystem"],
+                    default=DEFAULT_ARGS["reload_biosystem"],
                 )
                 parser.add_argument(
                     "-c",
                     "--config_files",
                     nargs="*",
                     type=str,
-                    default=default_args["config_files"],
+                    default=DEFAULT_ARGS["config_files"],
                 )
                 args = parser.parse_args()
             else:
-                args = default_args
+                args = DEFAULT_ARGS
 
             # Process arguments
             args["config_files"].append("_DEFAULT.yml")
