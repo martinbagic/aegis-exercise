@@ -1,5 +1,3 @@
-"""Classes for simulating pleiotropy"""
-
 import numpy as np
 
 

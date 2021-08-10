@@ -1,161 +1,63 @@
-# AEGIS
+## Input
 
-## Setup instructions
+As input, the user can specify parameters (to customize the simulation conditions) and supply [pickled](https://docs.python.org/3/library/pickle.html) demes (to restore pre-evolved populations).
 
-<details>
-  <summary>Setup for macOS & Linux</summary>
+### 1. Parameters
 
-### I. Check if Python3 is installed
+This section explains where AEGIS pulls the parameters from. The available parameters and their values are described in
+[another section](#list-of-parameters).
 
-1. Run terminal. (Command + Space. Type in **Terminal**. Launch.)
-1. Run `python3 --version`.
-   - If you get a message `Python 3.x.x` (x can be any number), Python3 is installed. Proceed with the next section.
-   - If you get an error message (e.g. `name 'python3' is not defined`), Python3 is not installed.
-     Proceed with the step 3.
-1. Download Python3. Go to www.python.org/downloads/. Click on the yellow button **Download Python 3.9.5** (the .pkg file has ~30 MB).
-1. Run the installation package. Use default settings.
-1. Restart terminal.
-1. Run `python3 --version`. Now you should get a message `Python 3.x.x` (x can be any number)
-1. Do not close the terminal.
+Parameters can be specified by:
 
-### II. Download AEGIS
+1. **Passing arguments when calling `aegis.Aegis`**, e.g. `aegis.Aegis(CYCLE_NUM=2000, MAX_LIFESPAN=90)`. This is relevant when Aegis is run via a script (e.g. in `tests/`).
+1. **Command line arguments**, in JSON format, e.g. `python3 main.py --params_extra '{"CYCLE_NUM": 2000, "MAX_LIFESPAN": 90}`. Those will be processed in the `macroconfig.Macroconfig` class. This is useful if one wants to slightly modify the parameters without having to create a separate config file. The command line input is documented in the output.
+1. **Config files**, in YML format, e.g. `input/config_preset/_DEFAULT.yml`. The default (`_DEFAULT.yml`) is always applied, but other config files can be added to, by specifying them in the command line, e.g. `python3 main.py --config_files extra.yml`. This is useful when many parameters need to be modified, or when the parameterization encodes a distinct scenario.
 
-1. Go to www.github.com/martinbagic/aegis-exercise
-1. Click on the green button **Code**.
-1. Click on **Download ZIP**.
-1. Move the downloaded folder to desktop.
+The priority decreases along this list, i.e. the parameters passed as arguments when calling `Aegis` override
+those passed as command line arguments, which override those in config files. Furthermore, when multiple
+config files are specified (e.g. `--config_file config_1.yml another_file.yml configc.yml`), the first file (`config_1.yml`) has the highest priority, while the last specified file (`configc.yml`) has the least priority.
 
-### III. Navigate to the working directory
+### 2. Pre-evolved demes
 
-1. Run: `cd ~/Desktop/aegis-exercise/`
-   - If you ever close the terminal, always run this command to return to the working directory.
+Seeding the simulation with pickles containing pre-evolved demes can be done using the `--reload_deme` flag (e.g. `python3 main.py --reload_deme path/to/pickle`).
 
-### IV. Install dependencies in a [virtual environment](https://docs.python.org/3/tutorial/venv.html)
+## Output
 
-1. Run: `python3 -m venv venv`
-1. Run: `. venv/bin/activate`
-   - Last line in terminal should now start with **(venv)**.
-1. Run: `python3 -m pip install -r requirements.txt`
-   - If you get a message **The "gcc" command requires the command line developer tools. Would you like to install the tools now?**, click **Install**. After installation, rerun this step 3.
-   - This might take a few minutes.
+Output contains the **summary of input specification**, a **copy of pickled demes** (if used), **data for visualization using Visor**, and **other fine-grained data** (including genotypic, phenotypic, population genetic, etc.). All output files are saved in the directory `output/{jobid}/` (jobid is either specified in the command line or, if not specified in the cmd, it takes the name of the first given config file; per default `_DEFAULT`).
 
-### V. Test AEGIS
+### 1. Summary of input specification
 
-1. Run: `python3 aegis.py -h`
-   - If it returns information about the **usage**, **positional arguments**, **optional arguments** and others, you can proceed with the next part (**How to run AEGIS**).
-   - If it returns **No such file or directory**, check if you are in the correct directory (run `cd ~/Desktop/aegis-exercise/`) and try again.
-   - If it returns **ModuleNotFoundError**, check that your virtual environment is activated (run `. venv/bin/activate`) and try again.
+This is a `input_summary.json` file important for reproducibility. It contains all final parameters.
 
-</details>
+### 2. Pickled deme
 
-<details>
-  <summary>Setup for Windows</summary>
+Pickled demes can be found in the folder `pickles/`. The files will be named by the stage number at which the deme was pickled.
 
-### 0. Install Visual CPP Build Tools
+### 3. Data for Visor
 
-1. Go to https://visualstudio.microsoft.com/visual-cpp-build-tools/
-1. Click the purple button **Download build tools**.
-1. Run the downloaded file **vs_BuildTools.exe**.
-1. Click Continue.
-1. Check **C++ build tools box** (the box has an icon with a screen and two purple pluses).
-1. Click Install.
+Data for visor is saved in the folder `visor/` and it is used by _visor_ to visualize the evolution of the simulated population. It contains multiple files:
 
-### I. Check if Python3 is installed
+1. `genotypes.csv`
+1. `phenotypes.csv`
+1. `demography.csv`
+1. `phylogeny.csv`
+1. `stats.csv`
 
-1. Run terminal from desktop.
-   - Shift + right-click on desktop.
-   - Click **Open PowerSHell window here**.
-1. Run `py -3 --version`.
-   - If you get a message `Python 3.x.x` (x can be any number), Python3 is installed. Proceed with the next section (**II. Download AEGIS**).
-   - If you get an error message (e.g. `Python was not found`), Python3 is not installed.
-     Proceed with the step 3.
-1. Download Python3. Go to www.python.org/downloads/. Click on the yellow button **Download Python 3.9.5** (the .exe file has ~28 MB).
-1. Run the installation package. Check box **Add Python 3.9 to PATH**. Click on **Install Now**.
-1. Close and open the terminal again as in step 1.
-1. Run `py -3 --version`. Now you should get a message `Python 3.x.x` (x can be any number)
-1. Do not close the terminal.
+### 4. Other data
 
-### II. Download AEGIS
+Other data is saved in the folder `data/` using the [feather](https://github.com/wesm/feather) format. The file naming
+specified the stage at which the data was captured, and also the kind of data captured:
 
-1. Go to www.github.com/martinbagic/aegis-exercise
-1. Click on the green button **Code**.
-1. Click on **Download ZIP**.
-1. Move the downloaded folder to desktop.
-1. Right-click on the zip file and click **Extract here**.
+1. `{stage}.genotypes`
+1. `{stage}.phenotypes`
+1. `{stage}.demography`
 
-### III. Navigate to the working directory
+## List of parameters
 
-1. Run: `cd aegis-exercise`
-   - Your command line path should be **?:\Users\\?\Desktop\aegis-exercise**
+## Command line options
 
-### IV. Install dependencies in a [virtual environment](https://docs.python.org/3/tutorial/venv.html)
+## Visor
 
-1. Run: `py -3 -m venv venv`
-1. Run: `.\venv\Scripts\activate`
-   - If the shell returns a new line with **(venv)** at the beginning, virtual environment is
-     successfully activated, so you can proceed with the step 3.
-   - If the shell returns an error **cannot be loaded because running scripts is disabled**:
-     - Run: `Set-ExecutionPolicy Unrestricted -Scope Process`
-     - When prompted, write **Y** and confirm by pushing **Enter**.
-     - Repeat this step by running: `.\venv\Scripts\activate`
-1. Run: `py -3 -m pip install -r requirements.txt`
-   - This will take about 5 minutes depending on your machine.
+Visor is the visualization tool complementary to AEGIS.
 
-### V. Test AEGIS
-
-1. Run: `py -3 aegis.py -h`
-   - If it returns information about the **usage**, **positional arguments**, **optional arguments** and others, you can proceed with the next part (**How to run AEGIS**).
-   - If it returns **No such file or directory**, check if you are in the correct directory (`?:\Users\?\Desktop\aegis-exercise` where first ? is your disk, and the second ? your username) and try again.
-   - If it returns **ModuleNotFoundError**, check that your virtual environment is activated (run `.\venv\Scripts\activate`) and try again.
-
-</details>
-
-## How to run AEGIS?
-
-To run AEGIS, run the following command in the terminal:
-
-- `python3 aegis.py -c CONFIG_FILE` (macOS & Linux)
-- `py -3 aegis.py -c CONFIG_FILE` (Windows)
-
-but instead of `CONFIG_FILE` write the name of the actual config file you intend to use.
-You can also run the simulation without `-c CONFIG_FILE`; it will then use the default parameters.
-
-### Custom parameters
-
-If you want to change the parameters of the simulation, you should create a new config file
-in the folder _config_custom_ and add your parameters of interest in it.
-For example, look at the custom config file _bigger_population.yml_.
-It has a single parameter `MAX_POPULATION_SIZE` which has been set to 1500.
-When you look in the default config file (\__DEFAULT.yml_), you will see that the
-`MAX_POPULATION_SIZE` has previously been set to 300. So, when you run the command
-`python3 aegis.py -c bigger_population.yml`, your simulation will
-have the bigger population size of 1500.
-
-Note that names of all config files should end in _.yml_ file extension.
-
-You can open _.yml_ files with TextEdit (macOS) or Notepad (Windows)
-or a code editor (e.g. Visual Studio Code) or other tools.
-
-## How to visualize the simulation results?
-
-Open another terminal in the same folder. To use the visualization tool, run in the second terminal:
-
-- `python3 -m http.server --directory Visor/` (macOS & Linux)
-- `py -3 -m http.server --directory Visor/` (Windows)
-
-Open a browser of choice (e.g. Chrome) and write into URL bar `http://localhost:8000/` (or 192.168.X.X:8000 or 127.0.0.1:8000)
-
-## Explore
-
-1. Try different population sizes (`MAX_POPULATION_SIZE`).
-   - Do some populations go extinct? Why?
-   - Do bigger populations have more or fewer bits with high values? Why?
-1. Try different mutation rates (`GENOME_CONST: muta`). What happens when mutation rates are high and what when they are low? Why?
-1. Try different maturation ages (`MATURATION_AGE`). What happens to the reproduction genes? Why?
-1. Try different number of bits per locus (`BITS_PER_LOCUS`, e.g. 4 or 16). What differences do you observe? Why?
-1. Try setting `OVERSHOOT_EVENT` to `treadmill_boomer` and `treadmill_zoomer`. What effects does this have on the population? Why?
-1. Try setting reproduction mode `REPR_MODE` to `sexual`. What happens? Why?
-1. How would you change the parameters if you wanted to make the population go extinct? What would ou do to make it be more stable (not go extinct)?
-1. How would you change the parameters to extend lifespan of the individuals and what to reduce it?
-1. Run a simulation with config file _AP_number.yml_. What do you observe? Why?
-1. Can you detect evolutionary differences when changing other parameters?
+<!-- TODO Add more -->

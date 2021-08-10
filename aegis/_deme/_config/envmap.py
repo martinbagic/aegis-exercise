@@ -1,6 +1,3 @@
-"""Classes for simulating the changing environment"""
-
-
 import numpy as np
 
 

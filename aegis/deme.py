@@ -1,41 +1,43 @@
 import numpy as np
 
-from class_data.pop import Pop
+from aegis._deme.pop import Pop
+from aegis import PAN
+
+# TODO: fix reloading demes
+# TODO: explicit sending of local parameters
 
 
-class Biosystem:
+class Deme:
     """Class that encodes the core, immutable aspects of the simulation"""
 
-    def __init__(self, pop=None, popid=None, auxi=None):
+    def __init__(self, pop=None, popid=None, config=None, recorder=None):
 
-        self.auxi = auxi
-        self.conf = auxi.configs[0]
-        self.popid = popid if not popid is None else auxi.get_popid()
+        self.config = config
+        self.popid = popid
+        self.recorder = recorder
         self.eggs = None  # for split generations
 
         def _initialize_genomes():
             # Make a genome array with random values
             genomes = np.random.random(
                 size=(
-                    self.conf.MAX_POPULATION_SIZE,
-                    self.conf.gstruc.length,
-                    self.conf.BITS_PER_LOCUS,
+                    self.config.MAX_POPULATION_SIZE,
+                    self.config.gstruc.length,
+                    self.config.BITS_PER_LOCUS,
                 )
             )
 
             # Make a bool map using the initial values from Traits
-            for trait in self.conf.gstruc.evolvable:
-                genomes[:, trait.slice] = (
-                    trait.cut(genomes) <= trait.initial
-                )
+            for trait in self.config.gstruc.evolvable:
+                genomes[:, trait.slice] = genomes[:, trait.slice] <= trait.initial
 
             genomes = genomes.astype(bool)
 
             # Guarantee survival and reproduction values up to first few mature ages
-            if self.conf.HEADSUP > -1:
-                headsup = self.conf.MATURATION_AGE + self.conf.HEADSUP
-                surv_start = self.conf.gstruc.surv.start
-                repr_start = self.conf.gstruc.repr.start
+            if self.config.HEADSUP > -1:
+                headsup = self.config.MATURATION_AGE + self.config.HEADSUP
+                surv_start = self.config.gstruc["surv"].start
+                repr_start = self.config.gstruc["repr"].start
                 genomes[:, surv_start : surv_start + headsup] = True
                 genomes[:, repr_start : repr_start + headsup] = True
 
@@ -43,24 +45,26 @@ class Biosystem:
 
         def _get_pop():
             if pop is None:
-                num = self.conf.MAX_POPULATION_SIZE
+                num = self.config.MAX_POPULATION_SIZE
 
                 genomes = _initialize_genomes()
                 ages = np.zeros(num, int)
                 origins = np.zeros(num, int) - 1
-                uids = self.conf.get_uids(num)
+                uids = self.config.get_uids(num)
                 births = np.zeros(num, int)
                 birthdays = np.zeros(num, int)
                 phenotypes = self._get_phenotype(genomes)
-                return Pop(genomes, ages, origins, uids, births, birthdays, phenotypes)
+                return Pop(
+                    genomes, ages, origins, uids, births, birthdays, phenotypes
+                )
             else:
                 return pop
 
         self.pop = _get_pop()
 
-    ###############
-    # CYCLE FUNCS #
-    ###############
+    #############
+    # ONE CYCLE #
+    #############
 
     def cycle(self):
         """Perform one simulation cycle"""
@@ -73,11 +77,8 @@ class Biosystem:
                 self.pop += self.eggs
                 self.eggs = None
 
-        # Counter add popsize and eggpopsize
-        # self.auxi.counter.append("popsize", len(self.pop))
-        # self.auxi.counter.append(
-        #     "eggpopsize", len(self.eggs) if self.eggs is not None else 0
-        # )
+        self.recorder.record_snapshots(self.pop)
+        self.recorder.record_visor(self.pop)
 
         if len(self.pop):
             self.eco_survival()
@@ -85,40 +86,47 @@ class Biosystem:
             self.reproduction()
             self.age()
 
-        # Counter count ages
-        self.auxi.counter.count("cumulative_ages", self.pop.ages)
+        self.recorder.collect("cumulative_ages", self.pop.ages)
 
-        self.conf.season.countdown -= 1
-
-        if self.conf.season.countdown == 0:
-            # Kill all living
+        self.config.season.countdown -= 1
+        if self.config.season.countdown == 0:
+            # Kill all living, hatch eggs, and restart season
             mask_kill = np.ones(len(self.pop), bool)
             self._kill(mask_kill, "season_shift")
-            # Hatch eggs
             _hatch_eggs(self)
-            # Restart season
-            self.conf.season.reset()
+            self.config.season.reset()
 
-        elif self.conf.season.countdown == float("inf"):
+        elif self.config.season.countdown == float("inf"):
             # Add newborns to population
             _hatch_eggs(self)
 
         # Evolve envmap if applicable
-        self.conf.envmap.evolve(stage=self.auxi.stage)
+        self.config.envmap.evolve(stage=PAN.stage)
 
         # Pickle self
-        if self.auxi.PICKLE_RATE and self.auxi.stage % self.auxi.PICKLE_RATE == 0:
-            self.auxi.recorder.pickle_pop(self, self.auxi.stage)
+        self.recorder.record_pickle(self)
+
+    def terminate(self):
+        # Pickle the current population
+        self.recorder.record_pickle(self)
+
+        # Kill the current population
+        mask_kill = np.ones(len(self.pop), bool)
+        self._kill(mask_kill, "end_of_sim")
+
+    ###############
+    # CYCLE LOGIC #
+    ###############
 
     def age(self):
         """Increase age of all by one and kill those that surpass max lifespan"""
         self.pop.ages += 1
-        mask_kill = self.pop.ages >= self.conf.MAX_LIFESPAN
+        mask_kill = self.pop.ages >= self.config.MAX_LIFESPAN
         self._kill(mask_kill=mask_kill, causeofdeath="max_lifespan")
 
     def eco_survival(self):
         """Impose ecological death, i.e. death that arises due to resource scarcity"""
-        mask_kill = self.conf.overshoot(n=len(self.pop))
+        mask_kill = self.config.overshoot(n=len(self.pop))
         self._kill(mask_kill=mask_kill, causeofdeath="overshoot")
 
     def gen_survival(self):
@@ -133,7 +141,7 @@ class Biosystem:
         def _recombine(genomes):
             """Return recombined genomes"""
 
-            if self.conf.RECOMBINATION_RATE == 0:
+            if self.config.RECOMBINATION_RATE == 0:
                 return genomes
 
             # Recombine genomes
@@ -144,7 +152,7 @@ class Biosystem:
             # Make choice array: when to take recombined and when to take original loci
             # -1 means synapse; +1 means clear
             rr = (
-                self.conf.RECOMBINATION_RATE / 2
+                self.config.RECOMBINATION_RATE / 2
             )  # / 2 because you are generating two random vectors (fwd and bkd)
             reco_fwd = (np.random.random(chromosomes1.shape) < rr) * -2 + 1
             reco_bkd = (np.random.random(chromosomes2.shape) < rr) * -2 + 1
@@ -223,7 +231,7 @@ class Biosystem:
 
             mutate_0to1 = (genomes == 0) & (
                 random_probabilities
-                < (mutation_probabilities * self.conf.MUTATION_RATIO)
+                < (mutation_probabilities * self.config.MUTATION_RATIO)
             )
             mutate_1to0 = (genomes == 1) & (
                 random_probabilities < mutation_probabilities
@@ -234,7 +242,7 @@ class Biosystem:
             return np.logical_xor(genomes, mutate)
 
         # Check if mature
-        mask_mature = self.pop.ages >= self.conf.MATURATION_AGE
+        mask_mature = self.pop.ages >= self.config.MATURATION_AGE
         if not any(mask_mature):
             return
 
@@ -246,22 +254,23 @@ class Biosystem:
 
         # Count ages at reproduction
         ages_repr = self.pop.ages[mask_repr]
-        self.auxi.counter.count("age_at_birth", ages_repr)
+        # self.macroconfig.counter.count("age_at_birth", ages_repr)
+        self.recorder.collect("age_at_birth", ages_repr)
 
         # Increase births statistics
         self.pop.births += mask_repr
 
         # Copy genomes of parents and modify
         genomes = self.pop.genomes[mask_repr]
-        if self.conf.REPR_MODE == "sexual":
+        if self.config.REPR_MODE == "sexual":
             genomes = _recombine(genomes)
             genomes, order = _assort(genomes)
         genomes = _mutate(genomes)
 
         # Get origins
-        if self.conf.REPR_MODE in ("asexual", "diasexual"):
+        if self.config.REPR_MODE in ("asexual", "diasexual"):
             origins = self.pop.uids[mask_repr]
-        elif self.conf.REPR_MODE == "sexual":
+        elif self.config.REPR_MODE == "sexual":
             origins = np.array(
                 [
                     f"{self.pop.uids[order[2*i]]}.{self.pop.uids[order[2*i+1]]}"
@@ -275,9 +284,9 @@ class Biosystem:
             genomes=genomes,
             ages=np.zeros(n, int),
             origins=origins,
-            uids=self.conf.get_uids(n),
+            uids=self.config.get_uids(n),
             births=np.zeros(n, int),
-            birthdays=np.zeros(n, int) + self.auxi.stage,
+            birthdays=np.zeros(n, int) + PAN.stage,
             phenotypes=self._get_phenotype(genomes),
         )
 
@@ -295,12 +304,12 @@ class Biosystem:
             """Interpret genomes"""
             interpretome = np.zeros(shape=omes.shape[:2])
 
-            for trait in self.conf.gstruc.evolvable:
+            for trait in self.config.gstruc.evolvable:
                 # fetch
-                loci = trait.cut(omes)
+                loci = omes[:, trait.slice]
 
                 # interpret
-                probs = self.conf.interpreter(loci, trait.interpreter)
+                probs = self.config.interpreter(loci, trait.interpreter)
 
                 # add back
                 interpretome[:, trait.slice] += probs
@@ -309,14 +318,14 @@ class Biosystem:
 
         def _bound(omes):
             """Impose lower and upper bounds for genetically encodable attributes."""
-            for trait in self.conf.gstruc.evolvable:
+            for trait in self.config.gstruc.evolvable:
                 lo, hi = trait.lo, trait.hi
-                omes[:, trait.slice] = trait.cut(omes) * (hi - lo) + lo
+                omes[:, trait.slice] = omes[:, trait.slice] * (hi - lo) + lo
             return omes
 
-        envgenomes = self.conf.envmap(genomes)
+        envgenomes = self.config.envmap(genomes)
         interpretome = _get_interpretome(envgenomes)
-        phenotypes = self.conf.phenomap(interpretome)
+        phenotypes = self.config.phenomap(interpretome)
         bounded_phenotypes = _bound(phenotypes)
 
         return bounded_phenotypes
@@ -328,7 +337,7 @@ class Biosystem:
             which_individuals = which_individuals[part]
 
         # first scenario
-        trait = self.conf.gstruc[attr]
+        trait = self.config.gstruc[attr]
         if not trait.evolvable:
             probs = trait.initial
 
@@ -359,15 +368,18 @@ class Biosystem:
         # Count ages at death
         if causeofdeath != "max_lifespan":
             ages_death = self.pop.ages[mask_kill]
-            self.auxi.counter.count(f"age_at_{causeofdeath}", ages_death)
+            # self.macroconfig.counter.count(f"age_at_{causeofdeath}", ages_death)
+            self.recorder.collect(f"age_at_{causeofdeath}", ages_death)
 
+        ### KEEP THIS FOR REFERENCE ###
+        #
         # Record (some or all) of killed individuals
-        mask_record = (
-            mask_kill.nonzero()[0][:: self.auxi.REC_EVERY_NTH]
-            if self.auxi.REC_EVERY_NTH > 1
-            else mask_kill
-        )
-        self.auxi.recorder.rec(self.pop[mask_record], causeofdeath, self.popid)
+        # mask_record = (
+        #     mask_kill.nonzero()[0][:: self.macroconfig.REC_EVERY_NTH]
+        #     if self.macroconfig.REC_EVERY_NTH > 1
+        #     else mask_kill
+        # )
+        # self.recorder.rec(self.pop[mask_record], causeofdeath, self.popid)
 
         # Retain survivors
         self.pop *= ~mask_kill

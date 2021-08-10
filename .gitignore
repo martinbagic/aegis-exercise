@@ -1,12 +1,13 @@
 ### Custom ###
 summoner
-tests
 docs
 Makefile
 Visor/json
 visor
 output
 temp
+old
+ipynb
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

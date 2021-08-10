@@ -1,15 +1,15 @@
 import numpy as np
-from class_logic.interpreter import Interpreter
-from class_logic.phenomap import Phenomap
-from class_logic.overshoot import Overshoot
-from class_logic.envmap import Envmap
-from class_logic.season import Season
 
-from class_data.gstruc import Gstruc, Trait
+from aegis._deme._config.interpreter import Interpreter
+from aegis._deme._config.overshoot import Overshoot
+from aegis._deme._config.phenomap import Phenomap
+from aegis._deme._config.season import Season
+from aegis._deme._config.envmap import Envmap
+from aegis._deme._config.gstruc import Gstruc
 
 
 class Config:
-    """Wrapper for biosystem-specific parameters"""
+    """Wrapper for deme-specific parameters"""
 
     def __init__(self, params):
 
@@ -31,9 +31,9 @@ class Config:
         self.CLIFF_SURVIVORSHIP = params["CLIFF_SURVIVORSHIP"]
 
         # Genome structure
-        self.gstruc = Gstruc(
-            traits=[Trait(name, params) for name in ["surv", "repr", "neut", "muta"]]
-        )
+        self.gstruc = Gstruc(params)
+        #     traits=[Trait(name, params) for name in PAN.traits]
+        # )
 
         # Simulation variables
         self.max_uid = 0  # ID of the most recently born individual
@@ -49,7 +49,7 @@ class Config:
 
         # Phenomap
         self.phenomap = (
-            Phenomap(PHENOMAP_PLUS=self.PHENOMAP_PLUS, pos_end=Trait.genome_length)
+            Phenomap(PHENOMAP_PLUS=self.PHENOMAP_PLUS, pos_end=self.gstruc.length)
             if self.PHENOMAP_PLUS != []
             else Phenomap()
         )
@@ -65,7 +65,7 @@ class Config:
         self.envmap = (
             Envmap(
                 BITS_PER_LOCUS=self.BITS_PER_LOCUS,
-                total_loci=Trait.genome_length,
+                total_loci=self.gstruc.length,
                 ENVMAP_RATE=self.ENVMAP_RATE,
             )
             if self.ENVMAP_RATE > 0

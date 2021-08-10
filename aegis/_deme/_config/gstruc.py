@@ -1,24 +1,21 @@
+from aegis import PAN
+
+
 class Gstruc:
     """Genome structure"""
 
-    def __init__(self, traits):
+    def __init__(self, params):
 
-        self.traits = {}
-        self.evolvable = []
+        self.traits = {name: Trait(name, params) for name in PAN.traits}
+        self.evolvable = [trait for trait in self.traits.values() if trait.evolvable]
         self.length = 0
 
-        for trait in traits:
+        for trait in self.traits.values():
             trait.start = self.length
             trait.end = self.length + trait.length
             trait.slice = slice(trait.start, trait.end)
 
             self.length = trait.end
-            self.traits[trait.name] = trait
-            if trait.evolvable:
-                self.evolvable.append(trait)
-
-    def __getattr__(self, name):
-        return self.traits[name]
 
     def __getitem__(self, name):
         return self.traits[name]
@@ -53,10 +50,6 @@ class Trait:
 
     def __len__(self):
         return self.length
-
-    def cut(self, array):
-        """Return the loci of each individual that encode this trait"""
-        return array[:, self.start : self.end]
 
     def __str__(self):
         return self.name
