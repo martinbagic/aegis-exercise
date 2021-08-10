@@ -1,8 +1,8 @@
 import numpy as np
 from class_logic.interpreter import Interpreter
-from class_logic.phenomap import Phenomap, PhenomapFake
+from class_logic.phenomap import Phenomap
 from class_logic.overshoot import Overshoot
-from class_logic.envmap import Envmap, EnvmapFake
+from class_logic.envmap import Envmap
 from class_logic.season import Season
 
 from class_data.gstruc import Gstruc, Trait
@@ -51,7 +51,7 @@ class Config:
         self.phenomap = (
             Phenomap(PHENOMAP_PLUS=self.PHENOMAP_PLUS, pos_end=Trait.genome_length)
             if self.PHENOMAP_PLUS != []
-            else PhenomapFake()
+            else Phenomap()
         )
 
         # Overshoot
@@ -69,7 +69,7 @@ class Config:
                 ENVMAP_RATE=self.ENVMAP_RATE,
             )
             if self.ENVMAP_RATE > 0
-            else EnvmapFake()
+            else Envmap()
         )
 
     def get_uids(self, n):
