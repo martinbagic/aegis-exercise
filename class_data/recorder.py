@@ -144,7 +144,7 @@ class Recorder:
             return array.iloc[
                 :,
                 self.gstruc[loci_kind].start
-                * bitsperlocus : self.gstruc[loci_kind].start
+                * bitsperlocus : self.gstruc[loci_kind].end
                 * bitsperlocus,
             ]
 
