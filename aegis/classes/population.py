@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Pop:
+class Population:
     """Wrapper for all population data"""
 
     attrs = (
@@ -33,7 +33,7 @@ class Pop:
 
     def __getitem__(self, index):
         """Return a subpopulation"""
-        return Pop(
+        return Population(
             genomes=self.genomes[index],
             ages=self.ages[index],
             origins=self.origins[index],
@@ -49,9 +49,9 @@ class Pop:
             setattr(self, attr, getattr(self, attr)[index])
         return self
 
-    def __iadd__(self, pop):
+    def __iadd__(self, population):
         """Merge with another population"""
         for attr in self.attrs:
-            val = np.concatenate([getattr(self, attr), getattr(pop, attr)])
+            val = np.concatenate([getattr(self, attr), getattr(population, attr)])
             setattr(self, attr, val)
         return self

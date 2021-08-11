@@ -1,17 +1,19 @@
+# Caution! Environment also needs to be pickled.
+
 import numpy as np
 
 
-class Envmap:
+class Environment:
     """Functional environmental map class"""
 
-    def __init__(self, BITS_PER_LOCUS=None, total_loci=None, ENVMAP_RATE=None):
+    def __init__(self, BITS_PER_LOCUS=None, total_loci=None, ENVIRONMENT_CHANGE_RATE=None):
 
-        if BITS_PER_LOCUS is None and total_loci is None and ENVMAP_RATE is None:
+        if BITS_PER_LOCUS is None and total_loci is None and ENVIRONMENT_CHANGE_RATE is None:
             self.fake = True
         else:
             self.fake = False
             self.map_ = np.zeros((total_loci, BITS_PER_LOCUS), bool)
-            self.envmap_rate = ENVMAP_RATE
+            self.ENVIRONMENT_CHANGE_RATE = ENVIRONMENT_CHANGE_RATE
 
     def __call__(self, genomes):
         """Return the genomes reinterpreted in the current environment"""
@@ -22,7 +24,7 @@ class Envmap:
         if self.fake:
             return
 
-        if stage % self.envmap_rate == 0:
+        if stage % self.ENVIRONMENT_CHANGE_RATE == 0:
             locus = np.random.choice(np.arange(self.map_.shape[0]))
             bit = np.random.choice(np.arange(self.map_.shape[1]))
             self.map_[locus, bit] = ~self.map_[locus, bit]

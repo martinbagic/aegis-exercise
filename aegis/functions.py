@@ -9,21 +9,54 @@ Parameter source priority:
 import yaml
 import logging
 import argparse
-import shutil
 
-from aegis import PAN
+import pickle
+
+from aegis.classes.deme import Deme
+from aegis.progresslog import ProgressLog
+from aegis.panconfiguration import pan
+
+
+logging.basicConfig(
+    format="%(asctime)s : %(message)s",
+    datefmt="%d/%m/%Y %I:%M:%S",
+    level=logging.info,
+)
 
 # TODO how to use input_summary.json to start a new simulation
 # TODO multiple populations
+# TODO test whether panconfiguration works with multiple aegis processes run
+
+# TODO perform warnings when passing information to aegis which isnt used because unpickling is enabled
+# TODO pickle only the Population
+
+
+def run(use_cmd, **programmatic_args):
+
+    params = get_params(use_cmd, programmatic_args)
+
+    pan.load_from_params(params)
+
+    demes = [Deme(params)]
+
+    progresslog = ProgressLog()
+
+    assert len(demes) == len(
+        set(deme.deme_id for deme in demes)
+    ), "Assert deme_id uniqueness"
+
+    logging.info("Simulation started")
+
+    while pan.stage < pan.CYCLE_NUM_:
+        pan.stage += 1
+        for deme in demes:
+            deme.cycle()
+        progresslog.log()
+
+    logging.info("Simulation finished")
 
 
 def get_params(use_cmd, programmatic_params):
-
-    # TODO consider setting macroconfig as a global module
-    # setattr(PAN, "macroconfig", self)
-
-    ### LOAD PARAMETERS ###
-
     # Get parameters
     def get_cmd_params():
 
@@ -35,29 +68,29 @@ def get_params(use_cmd, programmatic_params):
             parser.add_argument(
                 "--params_extra",
                 type=str,
-                default=PAN.default_cmd_arguments["params_extra"],
+                default=pan.default_cmd_arguments["params_extra"],
             )
             parser.add_argument(
                 "--jobid",
                 type=str,
-                default=PAN.default_cmd_arguments["jobid"],
+                default=pan.default_cmd_arguments["jobid"],
             )
             parser.add_argument(
                 "-r",
-                "--reload_deme",
+                "--unpickle_jobid",
                 type=str,
-                default=PAN.default_cmd_arguments["reload_deme"],
+                default=pan.default_cmd_arguments["unpickle_jobid"],
             )
             parser.add_argument(
                 "-c",
                 "--config_files",
                 nargs="*",
                 type=str,
-                default=PAN.default_cmd_arguments["config_files"],
+                default=pan.default_cmd_arguments["config_files"],
             )
             args = parser.parse_args()
         else:
-            args = PAN.default_cmd_arguments
+            args = pan.default_cmd_arguments
 
         # Process arguments
         args["config_files"].append("_DEFAULT.yml")
@@ -72,7 +105,7 @@ def get_params(use_cmd, programmatic_params):
         def find_config_file(config_file):
             """Find the config file either in config_preset/ or config_custom/"""
             for folder in ("config_preset", "config_custom"):
-                path = PAN.project_path / "input" / folder / config_file
+                path = pan.base_dir / "input" / folder / config_file
                 if path.is_file():
                     return path
 
@@ -98,43 +131,12 @@ def get_params(use_cmd, programmatic_params):
     params.update(cmd_params)
     params.update(programmatic_params)
 
-    # Log parameters
-    # logging.info("FINAL PARAMETERS:")
-    # for k, v in params.items():
-    #     logging.info(f"  {k:>20} = {v}")
-
     # Validate parameters
     assert params["BITS_PER_LOCUS"] % 2 == 0 or params["REPR_MODE"] == "asexual"
 
-    ### DISTRIBUTE PARAMETERS ###
-
-    # Simulation-wide parameters; assign to PAN
-    PAN.CYCLE_NUM = params["CYCLE_NUM"]
-    PAN.LOGGING_RATE = params["LOGGING_RATE"]
-    PAN.PICKLE_RATE = params["PICKLE_RATE"]
-    PAN.OVERWRITE_DIR = params["OVERWRITE_DIR"]
-    PAN.SNAPSHOT_RATE = params["SNAPSHOT_RATE"]
-    PAN.VISOR_RATE = params["VISOR_RATE"]
-    PAN.FLUSH_RATE = params["FLUSH_RATE"]
-    PAN.reload_deme = params["reload_deme"]
-    PAN.jobid = params["jobid"]
-    PAN.config_files = params["config_files"]
-    PAN.params_extra = params["params_extra"]
-
-    # Simulation-wide derived parameters; assign to PAN
-    def get_output_path():
-        output_path = PAN.project_path / "output" / params["jobid"]
-        if params["OVERWRITE_DIR"]:
-            shutil.rmtree(output_path, ignore_errors=True)
-        else:
-            i = 1
-            while output_path.is_dir():
-                logging.info(f"output_path '{output_path}' already exists")
-                output_path = PAN.project_path / "output" / (params["jobid"] + f"^{i}")
-                i += 1
-        logging.info(f"Using output_path '{output_path}'")
-        return output_path
-
-    PAN.output_path = get_output_path()
-
     return params
+
+
+def unpickle(path):
+    with open(path, "rb") as o:
+        return pickle.load(o)

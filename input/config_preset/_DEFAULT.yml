@@ -1,3 +1,27 @@
+# Note that inputs must be flat to enable specification of parameters via caller and cmd!
+
+#####################
+# GLOBAL PARAMETERS #
+#####################
+
+# RUNTIME
+CYCLE_NUM_: 1000000 # 1+ | How many stages does the simulation run for?
+LOGGING_RATE_: 500 # 1+ | Log every ?-th stage
+
+# RECORDING
+OVERWRITE_DIR_: False # True, False | Overwrite the output/{jobid} directory or not
+PICKLE_RATE_: 500 # 0+ | Pickle population every ? stages; 0 for no pickles
+SNAPSHOT_RATE_: 1000 # 0+ | Take a snapshot every ? stages; 0 for no snapshots
+VISOR_RATE_: 50 # 0+ | Take a visor snapshot every ? stages; 0 for no visor records
+FLUSH_RATE_: 20000 # 0+ | Flush every ? stages
+
+# MULTIPLE DEMES
+DEME_NUMBER_: 1
+
+####################
+# LOCAL PARAMETERS #
+####################
+
 # ECOLOGY
 MAX_POPULATION_SIZE: 300 # 1+ | Number of individuals in the population
 OVERSHOOT_EVENT: starvation # starvation, cliff, treadmill_random, treadmill_zoomer, treadmill_boomer | Who dies when everyone is starving?
@@ -45,22 +69,8 @@ RECOMBINATION_RATE: False # True, False | Is recombination possible?
 # MUTATION
 MUTATION_RATIO: 0.1 # real (0,+inf) | Ratio of beneficial mutations to detrimental mutations
 
-# RUNTIME
-CYCLE_NUM: 1000000 # 1+ | How many stages does the simulation run for?
-LOGGING_RATE: 500 # 1+ | Log every ?-th stage
-
-# RECORDING
-OVERWRITE_DIR: False # True, False | Overwrite the output/{jobid} directory or not
-PICKLE_RATE: 500 # 0+ | Pickle population every ? stages; 0 for no pickles
-SNAPSHOT_RATE: 1000 # 0+ | Take a snapshot every ? stages; 0 for no snapshots
-VISOR_RATE: 50 # 0+ | Take a visor snapshot every ? stages; 0 for no visor records
-FLUSH_RATE: 20000 # 0+ | Flush every ? stages
-
 # PHENOMAP
 PHENOMAP_PLUS: [] # | Specification of pleiotropic effects | [[geno index, pheno index, weight], ...]
 
 # ENVMAP
-ENVMAP_RATE: 0 # -+ | Environmental map changes every ? stages
-
-# MULTIPLE DEMES
-DEME_NUMBER: 1
+ENVIRONMENT_CHANGE_RATE: 0 # -+ | Environmental map changes every ? stages

@@ -1,4 +1,4 @@
-from aegis import PAN
+from aegis.panconfiguration import pan
 
 
 class Gstruc:
@@ -6,7 +6,7 @@ class Gstruc:
 
     def __init__(self, params):
 
-        self.traits = {name: Trait(name, params) for name in PAN.traits}
+        self.traits = {name: Trait(name, params) for name in pan.traits}
         self.evolvable = [trait for trait in self.traits.values() if trait.evolvable]
         self.length = 0
 

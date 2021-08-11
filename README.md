@@ -9,8 +9,8 @@ This section explains where AEGIS pulls the parameters from. The available param
 
 Parameters can be specified by:
 
-1. **Passing arguments when calling `aegis.Aegis`**, e.g. `aegis.Aegis(CYCLE_NUM=2000, MAX_LIFESPAN=90)`. This is relevant when Aegis is run via a script (e.g. in `tests/`).
-1. **Command line arguments**, in JSON format, e.g. `python3 main.py --params_extra '{"CYCLE_NUM": 2000, "MAX_LIFESPAN": 90}`. Those will be processed in the `macroconfig.Macroconfig` class. This is useful if one wants to slightly modify the parameters without having to create a separate config file. The command line input is documented in the output.
+1. **Passing arguments when calling `aegis.Aegis`**, e.g. `aegis.Aegis(CYCLE_NUM_=2000, MAX_LIFESPAN=90)`. This is relevant when Aegis is run via a script (e.g. in `tests/`).
+1. **Command line arguments**, in JSON format, e.g. `python3 main.py --params_extra '{"CYCLE_NUM_": 2000, "MAX_LIFESPAN": 90}`. Those will be processed in the `macroconfig.Macroconfig` class. This is useful if one wants to slightly modify the parameters without having to create a separate config file. The command line input is documented in the output.
 1. **Config files**, in YML format, e.g. `input/config_preset/_DEFAULT.yml`. The default (`_DEFAULT.yml`) is always applied, but other config files can be added to, by specifying them in the command line, e.g. `python3 main.py --config_files extra.yml`. This is useful when many parameters need to be modified, or when the parameterization encodes a distinct scenario.
 
 The priority decreases along this list, i.e. the parameters passed as arguments when calling `Aegis` override
@@ -19,7 +19,7 @@ config files are specified (e.g. `--config_file config_1.yml another_file.yml co
 
 ### 2. Pre-evolved demes
 
-Seeding the simulation with pickles containing pre-evolved demes can be done using the `--reload_deme` flag (e.g. `python3 main.py --reload_deme path/to/pickle`).
+Seeding the simulation with pickles containing pre-evolved demes can be done using the `--unpickle_jobid` flag (e.g. `python3 main.py --unpickle_jobid path/to/pickle`).
 
 ## Output
 
