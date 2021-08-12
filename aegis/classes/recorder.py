@@ -28,10 +28,10 @@ class Recorder:
         II. Flushes (collect data over time then flush)
     """
 
-    def __init__(self, deme_id, MAX_LIFESPAN):
+    def __init__(self, ecosystem_id, MAX_LIFESPAN):
         # Define output paths and make necessary directories
 
-        opath = pan.jobid_path / str(deme_id)
+        opath = pan.jobid_path / str(ecosystem_id)
 
         self.paths = {
             "BASE_DIR": opath,
@@ -62,23 +62,20 @@ class Recorder:
     ### RECORDING METHOD I. (snapshots) ###
 
     def record_input_summary(self, input_summary):
-        """Records aggregated parameters for a specific deme"""
+        """Records aggregated parameters for a specific ecosystem"""
         with open(self.paths["BASE_DIR"] / "input_summary.json", "w") as f:
             json.dump(input_summary, f, indent=4)
 
     def record_pickle(self, obj):
         """Pickle given population"""
-        if pan.skip(pan.PICKLE_RATE_):
-            return
-        # with open(self.paths["pickles"] / str(pan.stage), "wb") as ofile:
+        return
+        # if pan.skip(pan.PICKLE_RATE_):
+        #     return
+        # # with open(self.paths["pickles"] / str(pan.stage), "wb") as ofile:
+        # #     pickle.dump(obj, ofile)
+
+        # with open(self.paths["BASE_DIR"] / "ecosystem.pickle", "wb") as ofile:
         #     pickle.dump(obj, ofile)
-
-        with open(self.paths["BASE_DIR"] / "deme.pickle", "wb") as ofile:
-            pickle.dump(obj, ofile)
-
-        # TODO do not pickle mupltiple times
-        with open(self.paths["BASE_DIR"].parent / "pan.pickle", "wb") as ofile:
-            pickle.dump(pan, ofile)
 
     def record_visor(self, population):
         if pan.skip(pan.VISOR_RATE_):

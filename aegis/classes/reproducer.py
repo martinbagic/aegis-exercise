@@ -2,6 +2,9 @@ import numpy as np
 
 
 class Reproducer:
+
+    legal = ("sexual", "asexual", "diasexual") # Decision forking actually in ecosystem.py
+
     def __init__(self, RECOMBINATION_RATE, MUTATION_RATIO):
         self.RECOMBINATION_RATE = RECOMBINATION_RATE
         self.MUTATION_RATIO = MUTATION_RATIO
@@ -88,7 +91,7 @@ class Reproducer:
         return assorted, order
 
     def mutate(self, genomes, muta_prob):
-        
+
         random_probabilities = np.random.random(genomes.shape)
 
         # Broadcast to fit [individual, locus, bit] shape
@@ -97,9 +100,7 @@ class Reproducer:
         mutate_0to1 = (genomes == 0) & (
             random_probabilities < (mutation_probabilities * self.MUTATION_RATIO)
         )
-        mutate_1to0 = (genomes == 1) & (
-            random_probabilities < mutation_probabilities
-        )
+        mutate_1to0 = (genomes == 1) & (random_probabilities < mutation_probabilities)
 
         mutate = mutate_0to1 + mutate_1to0
 

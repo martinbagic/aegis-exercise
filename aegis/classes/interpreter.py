@@ -2,6 +2,9 @@ import numpy as np
 
 
 class Interpreter:
+
+    legal = ("uniform", "exp", "binary", "binary_exp", "binary_switch", "switch")
+
     """Class for transforming locus bits into gene activities"""
 
     def __init__(self, BITS_PER_LOCUS, REPR_MODE):

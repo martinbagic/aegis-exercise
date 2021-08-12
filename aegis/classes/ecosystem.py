@@ -12,32 +12,28 @@ from aegis.classes.population import Population
 
 from aegis.panconfiguration import pan
 
-# TODO: fix reloading demes
-# TODO: explicit sending of local parameters
-# TODO: remove unused code
 
-
-class Deme:
+class Ecosystem:
     """Container for one ecosystem"""
 
-    deme_id = 1
+    ecosystem_id = 1
 
     def __init__(self, params, population=None):
 
-        self.deme_id = Deme.deme_id
-        Deme.deme_id += 1
+        self.ecosystem_id = Ecosystem.ecosystem_id
+        Ecosystem.ecosystem_id += 1
 
-        # Save deme parameters
+        # Save ecosystem parameters
         self.MAX_LIFESPAN = params["MAX_LIFESPAN"]  # used in self.age()
         self.MATURATION_AGE = params["MATURATION_AGE"]  # used in self.reproduction()
         self.REPR_MODE = params["REPR_MODE"]  # used in self.reproduction()
 
-        # Initialize deme variables
+        # Initialize ecosystem variables
         self.max_uid = 0  # ID of the most recently born individual
 
         # Initialize recorder
         self.recorder = Recorder(
-            deme_id=self.deme_id,
+            ecosystem_id=self.ecosystem_id,
             MAX_LIFESPAN=params["MAX_LIFESPAN"],
         )
         self.recorder.record_input_summary(params)  # Record input summary
@@ -360,7 +356,7 @@ class Deme:
         #     if self.macroconfig.REC_EVERY_NTH > 1
         #     else mask_kill
         # )
-        # self.recorder.rec(self.population[mask_record], causeofdeath, self.deme_id)
+        # self.recorder.rec(self.population[mask_record], causeofdeath, self.ecosystem_id)
 
         # Retain survivors
         self.population *= ~mask_kill

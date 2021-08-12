@@ -2,13 +2,21 @@
 
 import numpy as np
 
+from aegis.panconfiguration import pan
+
 
 class Environment:
     """Functional environmental map class"""
 
-    def __init__(self, BITS_PER_LOCUS=None, total_loci=None, ENVIRONMENT_CHANGE_RATE=None):
+    def __init__(
+        self, BITS_PER_LOCUS=None, total_loci=None, ENVIRONMENT_CHANGE_RATE=None
+    ):
 
-        if BITS_PER_LOCUS is None and total_loci is None and ENVIRONMENT_CHANGE_RATE is None:
+        if (
+            BITS_PER_LOCUS is None
+            and total_loci is None
+            and ENVIRONMENT_CHANGE_RATE is None
+        ):
             self.fake = True
         else:
             self.fake = False
@@ -24,7 +32,7 @@ class Environment:
         if self.fake:
             return
 
-        if stage % self.ENVIRONMENT_CHANGE_RATE == 0:
+        if not pan.skip(self.ENVIRONMENT_CHANGE_RATE):
             locus = np.random.choice(np.arange(self.map_.shape[0]))
             bit = np.random.choice(np.arange(self.map_.shape[1]))
             self.map_[locus, bit] = ~self.map_[locus, bit]

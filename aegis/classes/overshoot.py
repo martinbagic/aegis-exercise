@@ -4,6 +4,14 @@ import numpy as np
 class Overshoot:
     """Class for deciding which individuals to eliminate when overcrowded"""
 
+    legal = (
+        "treadmill_random",
+        "treadmill_boomer",
+        "treadmill_zoomer",
+        "cliff",
+        "starvation",
+    )
+
     def __init__(self, OVERSHOOT_EVENT, MAX_POPULATION_SIZE, CLIFF_SURVIVORSHIP):
         self.MAX_POPULATION_SIZE = MAX_POPULATION_SIZE
         self.CLIFF_SURVIVORSHIP = CLIFF_SURVIVORSHIP

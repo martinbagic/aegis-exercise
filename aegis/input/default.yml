@@ -1,5 +1,3 @@
-# Note that inputs must be flat to enable specification of parameters via caller and cmd!
-
 #####################
 # GLOBAL PARAMETERS #
 #####################
@@ -9,14 +7,14 @@ CYCLE_NUM_: 1000000 # 1+ | How many stages does the simulation run for?
 LOGGING_RATE_: 500 # 1+ | Log every ?-th stage
 
 # RECORDING
-OVERWRITE_DIR_: False # True, False | Overwrite the output/{jobid} directory or not
+JOBID_TIME_STAMP_: True # True, False | Add time stamp to output/{jobid} directory
 PICKLE_RATE_: 500 # 0+ | Pickle population every ? stages; 0 for no pickles
 SNAPSHOT_RATE_: 1000 # 0+ | Take a snapshot every ? stages; 0 for no snapshots
 VISOR_RATE_: 50 # 0+ | Take a visor snapshot every ? stages; 0 for no visor records
 FLUSH_RATE_: 20000 # 0+ | Flush every ? stages
 
-# MULTIPLE DEMES
-DEME_NUMBER_: 1
+# MULTIPLE ECOSYSTEMS
+ECOSYSTEM_NUMBER_: 1
 
 ####################
 # LOCAL PARAMETERS #
@@ -63,14 +61,14 @@ G_muta_evolvable: false
 G_muta_initial: 0.001
 
 # REPRODUCTION
-REPR_MODE: asexual # sexual, asexual | Reproduction mode
+REPR_MODE: asexual # sexual, asexual, diasexual | Reproduction mode
 RECOMBINATION_RATE: False # True, False | Is recombination possible?
 
 # MUTATION
-MUTATION_RATIO: 0.1 # real (0,+inf) | Ratio of beneficial mutations to detrimental mutations
+MUTATION_RATIO: 0.1 # real 0+ | Ratio of beneficial mutations to detrimental mutations
 
 # PHENOMAP
 PHENOMAP_PLUS: [] # | Specification of pleiotropic effects | [[geno index, pheno index, weight], ...]
 
-# ENVMAP
-ENVIRONMENT_CHANGE_RATE: 0 # -+ | Environmental map changes every ? stages
+# ENVIRONMENT
+ENVIRONMENT_CHANGE_RATE: 0 # 0+ | Environmental map changes every ? stages

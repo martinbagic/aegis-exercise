@@ -1,4 +1,5 @@
 from aegis.panconfiguration import pan
+from aegis.classes.interpreter import Interpreter
 
 
 class Gstruc:
@@ -47,6 +48,18 @@ class Trait:
 
         else:
             self.length = 0
+
+        self.validate()
+
+    def validate(self):
+        assert isinstance(self.evolvable, bool)
+        assert 0 <= self.initial <= 1
+
+        if self.evolvable:
+            assert isinstance(self.agespec, bool)
+            assert self.interpreter in Interpreter.legal
+            assert 0 <= self.lo <= 1
+            assert 0 <= self.hi <= 1
 
     def __len__(self):
         return self.length

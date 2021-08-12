@@ -1,8 +1,0 @@
-HEADSUP: -1
-
-BITS_PER_LOCUS: 4
-GENOME_STRUCT:
-  surv: [true, switch, 0, 1, 1]
-  repr: [true, switch, 0, 0.5, 1]
-
-MUTATION_RATIO: 1
