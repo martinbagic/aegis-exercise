@@ -1,3 +1,7 @@
+# AEGIS
+
+This is a test.
+
 ## Input
 
 As input, the user can specify parameters (to customize the simulation conditions) and supply [pickled](https://docs.python.org/3/library/pickle.html) ecosystems (to restore pre-evolved populations).
@@ -61,3 +65,9 @@ specified the stage at which the data was captured, and also the kind of data ca
 Visor is the visualization tool complementary to AEGIS.
 
 <!-- TODO Add more -->
+
+
+# Development
+```
+python3 -m pip install -e .[dev]
+```

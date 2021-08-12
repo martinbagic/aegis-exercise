@@ -7,7 +7,7 @@ import time
 class Panconfiguration:
 
     traits = ("surv", "repr", "neut", "muta")
-    base_dir = pathlib.Path(__file__).absolute().parent.parent
+    base_dir = pathlib.Path(__file__).absolute().parent.parent.parent
 
     # stage_cumulative = None  # Number of stages from the first (not pickled) version
 

@@ -6,7 +6,6 @@ Parameter source priority:
     4. config_params: _DEFAULT config file; default item added to the end of the list
 """
 
-from typing import final
 import yaml
 import logging
 import argparse
@@ -16,9 +15,6 @@ import pickle
 
 from aegis.classes.reproducer import Reproducer
 from aegis.classes.overshoot import Overshoot
-from aegis.progresslog import ProgressLog
-from aegis.classes.ecosystem import Ecosystem
-
 from aegis.panconfiguration import pan
 
 logging.basicConfig(
@@ -33,31 +29,6 @@ logging.basicConfig(
 
 # TODO perform warnings when passing information to aegis which isnt used because unpickling is enabled
 # TODO pickle only the Population and the Environment
-
-
-def run(use_cmd, **programmatic_args):
-
-    params = get_params(use_cmd, programmatic_args)
-
-    pan.load(params)
-
-    # Create ecosystems
-    ecosystems = [Ecosystem(params)]
-    assert len(ecosystems) == len(
-        set(ecosystem.ecosystem_id for ecosystem in ecosystems)
-    ), "Assert ecosystem_id uniqueness"
-
-    # Create progresslog
-    progresslog = ProgressLog()
-
-    # Run simulation
-    logging.info("Simulation started")
-    while pan.stage < pan.CYCLE_NUM_:
-        pan.stage += 1
-        for ecosystem in ecosystems:
-            ecosystem.cycle()
-        progresslog.log()
-    logging.info("Simulation finished")
 
 
 def get_params(use_cmd, programmatic_params):
@@ -104,13 +75,13 @@ def get_params(use_cmd, programmatic_params):
 
         # Read config parameters from custom config files
         custom_config_params = [
-            read_yml(pan.base_dir / "input" / custom_config_file)
+            read_yml(pan.base_dir / "src" / "input" / custom_config_file)
             for custom_config_file in custom_config_files
         ]
 
         # Read config parameters from the default config file
         default_config_params = [
-            read_yml(pan.base_dir / "aegis" / "input" / "default.yml")
+            read_yml(pan.base_dir / "src" / "aegis" / "input" / "default.yml")
         ]
 
         # Join lists and invert (to respect priority)
@@ -209,7 +180,7 @@ def get_params(use_cmd, programmatic_params):
         # - OK
 
     def validate_programmatic_params(programmatic_params):
-        legal_types = read_yml(pan.base_dir / "aegis/input/legal_types.yml")
+        legal_types = read_yml(pan.base_dir / "src/aegis/input/legal_types.yml")
 
         for param_name, param_value in programmatic_params.items():
             assert param_name in legal_types.keys()
@@ -231,7 +202,6 @@ def get_params(use_cmd, programmatic_params):
     extra_params = get_extra_params(cmd_params["extra_params"], config_params)
 
     # TODO type(True)("False") evaluates to True; problem with extra parameters!!!
-
 
     ### PROCESS ALL PARAMETERS
 
