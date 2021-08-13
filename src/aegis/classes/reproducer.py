@@ -3,7 +3,7 @@ import numpy as np
 
 class Reproducer:
 
-    legal = ("sexual", "asexual", "diasexual") # Decision forking actually in ecosystem.py
+    legal = ("sexual", "asexual", "asexual_diploid") # Decision forking actually in ecosystem.py
 
     def __init__(self, RECOMBINATION_RATE, MUTATION_RATIO):
         self.RECOMBINATION_RATE = RECOMBINATION_RATE

@@ -1,40 +1,40 @@
 import numpy as np
 
+import logging
+
 
 class Interpreter:
+    """Class for transforming locus bits into gene activities"""
 
     legal = ("uniform", "exp", "binary", "binary_exp", "binary_switch", "switch")
 
-    """Class for transforming locus bits into gene activities"""
-
     def __init__(self, BITS_PER_LOCUS, REPR_MODE):
-        self.ploidy = {"sexual": 2, "asexual": 1, "diasexual": 2}[REPR_MODE]
+        self.ploidy = {"sexual": 2, "asexual": 1, "asexual_diploid": 2}[REPR_MODE]
+
+        # Number of bits once the chromosomes are collapsed, e.g. if ploidy is 2, there will be N/2 bits per locus after collapsing
+        assert (
+            BITS_PER_LOCUS % self.ploidy == 0
+        ), "BITS_PER_LOCUS must be divisible by ploidy"
+        self.collapsed_bits = BITS_PER_LOCUS // self.ploidy
 
         # Parameters for the binary interpreter
-        self.binary_weights = 2 ** np.arange(BITS_PER_LOCUS // self.ploidy)[::-1]
+        self.binary_weights = 2 ** np.arange(self.collapsed_bits)[::-1]
         self.binary_max = self.binary_weights.sum()
 
         # Parameters for the binary switch interpreter
         self.binary_switch_weights = self.binary_weights.copy()
-        self.binary_switch_weights[-1] = 0
+        self.binary_switch_weights[
+            -self.ploidy :
+        ] = 0  # Switch bits do not add to locus value
         self.binary_switch_max = self.binary_switch_weights.sum()
-
-        self.interpreter_map = {
-            "uniform": self._uniform,
-            "exp": self._exp,
-            "binary": self._binary,
-            "binary_exp": self._binary_exp,
-            "binary_switch": self._binary_switch,
-            "switch": self._switch,
-        }
 
     def __call__(self, loci, interpreter_kind):
         """The exposed function for calling"""
-        interpreter = self.interpreter_map[interpreter_kind]
+        interpreter = getattr(self, f"_{interpreter_kind}")
+        # interpreter = self.interpreter_map[interpreter_kind]
 
-        # If diploid, check if homozygous 1
-        if self.ploidy == 2:
-            loci = np.logical_and(loci[:, :, ::2], loci[:, :, 1::2])
+        # Take ploidy in consideration by taking an average of n bits from the locus
+        loci = loci.reshape(*loci.shape[:2], self.collapsed_bits, self.ploidy).mean(3)
 
         interpretome = interpreter(loci)
 
@@ -60,7 +60,7 @@ class Interpreter:
 
     def _binary_switch(self, loci):
         """
-        Binary interpreter with a switch bit which, when 0, sets the value of the locus to 0.
+        If any of the last n bits of an n-ploid population is 0, the locus resolves to 0.
         """
         where_on = loci[:, :, -1] == 1  # Loci which are turned on
         values = np.zeros(loci.shape[:-1], float)  # Default locus value is 0

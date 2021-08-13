@@ -239,7 +239,7 @@ class Ecosystem:
         genomes = self.reproducer.mutate(genomes, muta_prob)
 
         # Get origins
-        if self.REPR_MODE in ("asexual", "diasexual"):
+        if self.REPR_MODE in ("asexual", "asexual_diploid"):
             origins = self.population.uids[mask_repr]
         elif self.REPR_MODE == "sexual":
             origins = np.array(
