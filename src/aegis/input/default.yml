@@ -68,7 +68,7 @@ RECOMBINATION_RATE: False # True, False | Is recombination possible?
 MUTATION_RATIO: 0.1 # real 0+ | Ratio of beneficial mutations to detrimental mutations
 
 # PHENOMAP
-PHENOMAP_PLUS: [] # | Specification of pleiotropic effects | [[geno index, pheno index, weight], ...]
+PLEIOTROPY_SPECS: [] # | Specification of pleiotropic effects | [[geno index, pheno index, weight], ...]
 
 # ENVIRONMENT
 ENVIRONMENT_CHANGE_RATE: 0 # 0+ | Environmental map changes every ? stages

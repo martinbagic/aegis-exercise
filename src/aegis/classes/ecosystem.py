@@ -3,7 +3,7 @@ import numpy as np
 from aegis.classes.interpreter import Interpreter
 from aegis.classes.reproducer import Reproducer
 from aegis.classes.overshoot import Overshoot
-from aegis.classes.phenomap import Phenomap
+from aegis.classes.pleiotropy import Pleiotropy
 from aegis.classes.recorder import Recorder
 from aegis.classes.season import Season
 from aegis.classes.environment import Environment
@@ -56,11 +56,11 @@ class Ecosystem:
             REPR_MODE=params["REPR_MODE"],
         )
 
-        # Initialize phenomap
-        self.phenomap = (
-            Phenomap(PHENOMAP_PLUS=params["PHENOMAP_PLUS"], pos_end=self.gstruc.length)
-            if params["PHENOMAP_PLUS"] != []
-            else Phenomap()
+        # Initialize pleiotropy
+        self.pleiotropy = (
+            Pleiotropy(PLEIOTROPY_SPECS=params["PLEIOTROPY_SPECS"], pos_end=self.gstruc.length)
+            if params["PLEIOTROPY_SPECS"] != []
+            else Pleiotropy()
         )
 
         # Initialize overshoot
@@ -302,7 +302,7 @@ class Ecosystem:
 
         envgenomes = self.environment(genomes)
         interpretome = _get_interpretome(envgenomes)
-        phenotypes = self.phenomap(interpretome)
+        phenotypes = self.pleiotropy(interpretome)
         bounded_phenotypes = _bound(phenotypes)
 
         return bounded_phenotypes

@@ -162,10 +162,10 @@ def get_params(use_cmd, programmatic_params):
         # Mutation
         assert params["MUTATION_RATIO"] >= 0
 
-        # Phenomap
-        assert isinstance(params["PHENOMAP_PLUS"], list)
+        # Pleiotropy
+        assert isinstance(params["PLEIOTROPY_SPECS"], list)
 
-        for triple in params["PHENOMAP_PLUS"]:
+        for triple in params["PLEIOTROPY_SPECS"]:
             assert 0 <= triple[0] < params["MAX_LIFESPAN"]  # genotype index
             assert 0 <= triple[1] < params["MAX_LIFESPAN"]  # phenotype index
             assert isinstance(triple[2], (int, float))  # weight
@@ -214,7 +214,7 @@ def get_params(use_cmd, programmatic_params):
     # Add jobid and unpickle_jobid from cmd_params to pan
     final_params["unpickle_jobid"] = cmd_params["unpickle_jobid"]
 
-    logging.warning(programmatic_params)
+    logging.info(programmatic_params)
 
     final_params["jobid"] = (
         cmd_params["jobid"]
