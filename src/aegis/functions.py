@@ -211,16 +211,22 @@ def get_params(use_cmd, programmatic_params):
     final_params.update(extra_params)
     final_params.update(programmatic_params)
 
-    # Add jobid and unpickle_jobid from cmd_params to pan
-    final_params["unpickle_jobid"] = cmd_params["unpickle_jobid"]
+    # Add jobid and unpickle_jobid
 
-    logging.info(programmatic_params)
-
-    final_params["jobid"] = (
-        cmd_params["jobid"]
-        if not final_params["JOBID_TIME_STAMP_"]
-        else cmd_params["jobid"] + f"@{time.time()}"
+    final_params["unpickle_jobid"] = (
+        programmatic_params["unpickle_jobid"]
+        if "unpickle_jobid" in programmatic_params
+        else cmd_params["unpickle_jobid"]
     )
+
+    jobid = (
+        programmatic_params["jobid"]
+        if "jobid" in programmatic_params
+        else cmd_params["jobid"]
+    )
+    if final_params["JOBID_TIME_STAMP_"]:
+        jobid += f"@{time.time()}"
+    final_params["jobid"] = jobid
 
     # Document all params
     final_params["_sources"] = {

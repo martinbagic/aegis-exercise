@@ -1,9 +1,15 @@
 import numpy as np
 
+from aegis.panconfiguration import pan
+
 
 class Reproducer:
 
-    legal = ("sexual", "asexual", "asexual_diploid") # Decision forking actually in ecosystem.py
+    legal = (
+        "sexual",
+        "asexual",
+        "asexual_diploid",
+    )  # Decision forking actually in ecosystem.py
 
     def __init__(self, RECOMBINATION_RATE, MUTATION_RATIO):
         self.RECOMBINATION_RATE = RECOMBINATION_RATE
@@ -25,8 +31,8 @@ class Reproducer:
         rr = (
             self.RECOMBINATION_RATE / 2
         )  # / 2 because you are generating two random vectors (fwd and bkd)
-        reco_fwd = (np.random.random(chromosomes1.shape) < rr) * -2 + 1
-        reco_bkd = (np.random.random(chromosomes2.shape) < rr) * -2 + 1
+        reco_fwd = (pan.rng.random(chromosomes1.shape) < rr) * -2 + 1
+        reco_bkd = (pan.rng.random(chromosomes2.shape) < rr) * -2 + 1
 
         # Propagate synapse
         reco_fwd_cum = np.cumprod(reco_fwd, axis=1)
@@ -64,7 +70,7 @@ class Reproducer:
 
         # Extract parent indices twice, and shuffle
         order = np.repeat(np.arange(len(genomes)), 2)
-        np.random.shuffle(order)
+        pan.rng.shuffle(order)
 
         # Check for selfing (selfing when pair contains equal parent indices)
         selfed = (order[::2] == order[1::2]).nonzero()[0] * 2
@@ -92,7 +98,7 @@ class Reproducer:
 
     def mutate(self, genomes, muta_prob):
 
-        random_probabilities = np.random.random(genomes.shape)
+        random_probabilities = pan.rng.random(genomes.shape)
 
         # Broadcast to fit [individual, locus, bit] shape
         mutation_probabilities = muta_prob[:, None, None]

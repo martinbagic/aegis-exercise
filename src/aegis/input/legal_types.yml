@@ -1,5 +1,12 @@
 # Important for 1) converting string types from command line and 2) input validation
 
+##################
+# CMD PARAMETERS #
+##################
+
+jobid: str
+unpickle_jobid: bool
+
 #####################
 # GLOBAL PARAMETERS #
 #####################

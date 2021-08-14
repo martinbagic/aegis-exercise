@@ -1,5 +1,7 @@
 import numpy as np
 
+from aegis.panconfiguration import pan 
+
 
 class Overshoot:
     """Class for deciding which individuals to eliminate when overcrowded"""
@@ -38,20 +40,20 @@ class Overshoot:
         """Let starved individuals die"""
         if n > self.MAX_POPULATION_SIZE:
             surv_probability = 0.95 ** self.consecutive_overshoot_n
-            random_probabilities = np.random.rand(n)
+            random_probabilities = pan.rng.random(n)
             mask = random_probabilities > surv_probability
         return mask
 
     def _treadmill_random(self, n):
         """Kill some extra individuals randomly"""
-        indices = np.random.choice(n, n - self.MAX_POPULATION_SIZE, replace=False)
+        indices = pan.rng.choice(n, n - self.MAX_POPULATION_SIZE, replace=False)
         mask = np.zeros(n, bool)
         mask[indices] = True
         return mask
 
     def _cliff(self, n):
         """Kill all but random few"""
-        indices = np.random.choice(
+        indices = pan.rng.choice(
             n, int(self.MAX_POPULATION_SIZE * self.CLIFF_SURVIVORSHIP), replace=False
         )
         mask = np.ones(n, bool)
@@ -68,4 +70,5 @@ class Overshoot:
         """Kill the youngest. Let oldest live."""
         mask = np.ones(n, bool)
         mask[: self.MAX_POPULATION_SIZE] = False
+
         return mask

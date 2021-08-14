@@ -1,5 +1,7 @@
 import pathlib
 import time
+import numpy
+import shutil
 
 # TODO migration: add a parameter that determines the magnetism with which a ecosystem attracts other individuals
 
@@ -8,6 +10,7 @@ class Panconfiguration:
 
     traits = ("surv", "repr", "neut", "muta")
     base_dir = pathlib.Path(__file__).absolute().parent.parent.parent
+    rng = numpy.random.default_rng(2021)
 
     # stage_cumulative = None  # Number of stages from the first (not pickled) version
 
@@ -31,6 +34,8 @@ class Panconfiguration:
 
         # Make jobid_path and the necessary directories
         self.jobid_path = self.base_dir / "output" / self.jobid
+        if self.jobid_path.exists():
+            shutil.rmtree(self.jobid_path) # Delete previous directory if existing
         self.jobid_path.mkdir(parents=True, exist_ok=True)
 
     def skip(self, rate):

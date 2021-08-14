@@ -1,9 +1,8 @@
-include *.txt
+include *.in
 include LICENSE
-recursive-include Visor *.css
-recursive-include Visor *.html
-recursive-include Visor *.ico
-recursive-include Visor *.js
-recursive-include Visor *.json
+recursive-include src *.css
+recursive-include src *.html
+recursive-include src *.ico
+recursive-include src *.js
 recursive-include src *.py
 recursive-include src *.yml

@@ -85,7 +85,7 @@ class Ecosystem:
         # Initialize population
         def _initialize_genomes():
             # Make a genome array with random values
-            genomes = np.random.random(
+            genomes = pan.rng.random(
                 size=(
                     params["MAX_POPULATION_SIZE"],
                     self.gstruc.length,
@@ -204,7 +204,7 @@ class Ecosystem:
     def gen_survival(self):
         """Impose genomic death, i.e. death that arises with probability encoded in the genome"""
         probs_surv = self._get_evaluation("surv")
-        mask_surv = np.random.random(len(probs_surv)) < probs_surv
+        mask_surv = pan.rng.random(len(probs_surv)) < probs_surv
         self._kill(mask_kill=~mask_surv, causeofdeath="genetic")
 
     def reproduction(self):
@@ -217,7 +217,7 @@ class Ecosystem:
 
         # Check if reproducing
         probs_repr = self._get_evaluation("repr", part=mask_mature)
-        mask_repr = np.random.random(len(probs_repr)) < probs_repr
+        mask_repr = pan.rng.random(len(probs_repr)) < probs_repr
         if sum(mask_repr) < 2:  # Forgo if not at least two available parents
             return
 

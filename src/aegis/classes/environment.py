@@ -33,6 +33,6 @@ class Environment:
             return
 
         if not pan.skip(self.ENVIRONMENT_CHANGE_RATE):
-            locus = np.random.choice(np.arange(self.map_.shape[0]))
-            bit = np.random.choice(np.arange(self.map_.shape[1]))
+            locus = pan.rng.choice(np.arange(self.map_.shape[0]))
+            bit = pan.rng.choice(np.arange(self.map_.shape[1]))
             self.map_[locus, bit] = ~self.map_[locus, bit]

@@ -1,5 +1,7 @@
 import numpy as np
 
+from aegis.panconfiguration import pan
+
 import logging
 
 
@@ -53,7 +55,7 @@ class Interpreter:
         Applicable to surv and repr traits.
         """
         sums = loci.mean(2)
-        rand_values = np.random.random(loci.shape[:-1]) < 0.5
+        rand_values = pan.rng.random(loci.shape[:-1]) < 0.5
         return np.select(
             [sums == 0, (sums > 0) & (sums < 1), sums == 1], [0, rand_values, 1]
         )
