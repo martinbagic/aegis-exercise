@@ -183,13 +183,15 @@ def get_params(use_cmd, programmatic_params):
         legal_types = read_yml(pan.base_dir / "src/aegis/input/legal_types.yml")
 
         for param_name, param_value in programmatic_params.items():
-            assert param_name in legal_types.keys()
-            assert str(type(param_value)) == legal_types[param_name]
+            assert param_name in legal_types.keys(), f"{param_name} is not a legal key"
+            assert (
+                type(param_value).__name__ == legal_types[param_name]
+            ), f"{param_name} is type {type(param_value).__name__}, but it should be {legal_types[param_name]}"
 
     ### GET ALL PARAMETERS
 
     # priority 1: PROGRAM CALL
-    # TODO validate_programmatic_params(programmatic_params)
+    validate_programmatic_params(programmatic_params)
 
     # N/A: COMMAND LINE
     cmd_params = get_cmd_params() if use_cmd else default_cmd_parameters
