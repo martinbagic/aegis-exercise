@@ -1,12 +1,12 @@
 import setuptools
 
 setuptools.setup(
-    name="aegis",
-    version="2.0.1",
+    name="aging-of-evolving-genomes",
+    version="2.0",
     description="",
-    author="...",
-    author_email="...",
-    url="...",
+    author="Martin Bagic, Will Bradshaw, Arian Sajina and Dario Valenzano",
+    author_email="martin.bagic@outlook.com, wbradshaw@age.mpg.de, asajina@age.mpg.de, Dario.Valenzano@age.mpg.de",
+    url="https://github.com/valenzano-lab/aegis",
     package_dir={"": "src"},
     packages=["aegis"],
     python_requires=">=3.6",

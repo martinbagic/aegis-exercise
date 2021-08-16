@@ -2,6 +2,6 @@
 This script is executed when you run `python3 -m aegis`.
 """
 
-from aegis.run import run
+import aegis
 
-run(use_cmd=True)
+aegis.run(use_cmd=True)

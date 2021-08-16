@@ -6,6 +6,7 @@
 
 jobid: str
 unpickle_jobid: bool
+config_files: list
 
 #####################
 # GLOBAL PARAMETERS #

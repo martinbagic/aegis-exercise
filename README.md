@@ -13,9 +13,9 @@ This section explains where AEGIS pulls the parameters from. The available param
 
 Parameters can be specified by:
 
-1. **Passing arguments when calling `aegis.Aegis`**, e.g. `aegis.Aegis(CYCLE_NUM_=2000, MAX_LIFESPAN=90)`. This is relevant when Aegis is run via a script (e.g. in `tests/`).
-1. **Command line arguments**, in JSON format, e.g. `python3 main.py --extra_params '{"CYCLE_NUM_": 2000, "MAX_LIFESPAN": 90}`. Those will be processed in the `macroconfig.Macroconfig` class. This is useful if one wants to slightly modify the parameters without having to create a separate config file. The command line input is documented in the output.
-1. **Config files**, in YML format, e.g. `input/config_preset/_DEFAULT.yml`. The default (`_DEFAULT.yml`) is always applied, but other config files can be added to, by specifying them in the command line, e.g. `python3 main.py --config_files extra.yml`. This is useful when many parameters need to be modified, or when the parameterization encodes a distinct scenario.
+1. **Passing arguments when calling `aegis.run.run`**, e.g. `aegis.run(CYCLE_NUM_=2000, MAX_LIFESPAN=90)`. This is relevant when Aegis is run as an imported module via a script (e.g. in `tests/`). All parameters specified in `legal_types.yml` can be set this way.
+1. **Command line arguments**, in JSON format, e.g. `aegis -e '{"CYCLE_NUM_": 2000, "MAX_LIFESPAN": 90}`. This method is useful if one wants to slightly modify the parameters without having to create a separate config file and calls AEGIS directly from the command line.
+1. **Config files**, in YML format. The default (`src/aegis/input/default.yml`) is always applied, but other config files can be added on top, by specifying them in the command line, e.g. `aegis -c path/to/input_file.yml`. This is useful when many parameters need to be modified, or when the parameterization encodes a distinct scenario which will be reused.
 
 The priority decreases along this list, i.e. the parameters passed as arguments when calling `Aegis` override
 those passed as command line arguments, which override those in config files. Furthermore, when multiple

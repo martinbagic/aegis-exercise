@@ -213,12 +213,18 @@ def get_params(use_cmd, programmatic_params):
     final_params.update(extra_params)
     final_params.update(programmatic_params)
 
-    # Add jobid and unpickle_jobid
+    # Add jobid, config_files, and unpickle_jobid from programmatic_params
 
     final_params["unpickle_jobid"] = (
         programmatic_params["unpickle_jobid"]
         if "unpickle_jobid" in programmatic_params
         else cmd_params["unpickle_jobid"]
+    )
+
+    final_params["config_files"] = (
+        programmatic_params["config_files"]
+        if "config_files" in programmatic_params
+        else cmd_params["config_files"]
     )
 
     jobid = (
