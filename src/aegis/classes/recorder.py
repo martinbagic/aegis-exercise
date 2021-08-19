@@ -6,6 +6,7 @@ import time
 import copy
 
 from aegis.panconfiguration import pan
+from aegis.classes.popgenstats import PopgenStats
 
 # TODO maybe don't record phenotypic data, instead transform the genotypic data to phenotypic when necessary
 
@@ -59,12 +60,26 @@ class Recorder:
         # Needed for output summary
         self.extinct = False
 
-    ### RECORDING METHOD I. (snapshots) ###
+        # PopgenStats
+        self.popgenstats = PopgenStats()
+
+    ### RECORDING METHOD 0. (record once) ###
 
     def record_input_summary(self, input_summary):
         """Records aggregated parameters for a specific ecosystem"""
         with open(self.paths["BASE_DIR"] / "input_summary.json", "w") as f:
             json.dump(input_summary, f, indent=4)
+
+    def record_output_summary(self):
+        output_summary = {
+            "extinct": self.extinct,
+            "TIME_START": pan.time_start,
+            "time_end": time.time(),
+        }
+        with open(self.paths["BASE_DIR"] / "output_summary.json", "w") as f:
+            json.dump(output_summary, f, indent=4)
+
+    ### RECORDING METHOD I. (snapshots) ###
 
     def record_pickle(self, obj):
         """Pickle given population"""
@@ -116,14 +131,13 @@ class Recorder:
         df_dem.reset_index(drop=True, inplace=True)
         df_dem.to_feather(self.paths["snapshots_demography"] / f"{pan.stage}.feather")
 
-    def record_output_summary(self):
-        output_summary = {
-            "extinct": self.extinct,
-            "TIME_START": pan.time_start,
-            "time_end": time.time(),
-        }
-        with open(self.paths["BASE_DIR"] / "output_summary.json", "w") as f:
-            json.dump(output_summary, f, indent=4)
+    def record_popgenstats(self, population):
+        if pan.skip(pan.POPGENSTATS_RATE_):
+            return
+
+        with open(self.paths["BASE_DIR"] / "popgenstats.csv", "ab") as f:
+            array = self.popgenstats.analyze(population)
+            np.savetxt(f, [array], delimiter=",", fmt="%1.3e")
 
     ### RECORDING METHOD II. (flushes) ###
 

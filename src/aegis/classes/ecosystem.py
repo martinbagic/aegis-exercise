@@ -58,7 +58,9 @@ class Ecosystem:
 
         # Initialize pleiotropy
         self.pleiotropy = (
-            Pleiotropy(PLEIOTROPY_SPECS=params["PLEIOTROPY_SPECS"], pos_end=self.gstruc.length)
+            Pleiotropy(
+                PLEIOTROPY_SPECS=params["PLEIOTROPY_SPECS"], pos_end=self.gstruc.length
+            )
             if params["PLEIOTROPY_SPECS"] != []
             else Pleiotropy()
         )
@@ -147,6 +149,7 @@ class Ecosystem:
 
         self.recorder.record_snapshots(self.population)
         self.recorder.record_visor(self.population)
+        self.recorder.record_popgenstats(self.population)
 
         if len(self.population):
             self.eco_survival()

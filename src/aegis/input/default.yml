@@ -12,6 +12,7 @@ PICKLE_RATE_: 500 # 0+ | Pickle population every ? stages; 0 for no pickles
 SNAPSHOT_RATE_: 1000 # 0+ | Take a snapshot every ? stages; 0 for no snapshots
 VISOR_RATE_: 50 # 0+ | Take a visor snapshot every ? stages; 0 for no visor records
 FLUSH_RATE_: 20000 # 0+ | Flush every ? stages
+POPGENSTATS_RATE_: 50 # 0+ | Record population genetic stats about the population every ? stages; 0 for no popgen stats
 
 # MULTIPLE ECOSYSTEMS
 ECOSYSTEM_NUMBER_: 1

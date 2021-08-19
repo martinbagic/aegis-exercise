@@ -28,6 +28,7 @@ class Panconfiguration:
         self.SNAPSHOT_RATE_ = params["SNAPSHOT_RATE_"]
         self.VISOR_RATE_ = params["VISOR_RATE_"]
         self.FLUSH_RATE_ = params["FLUSH_RATE_"]
+        self.POPGENSTATS_RATE_ = params["POPGENSTATS_RATE_"]
 
         self.unpickle_jobid = params["unpickle_jobid"]
         self.jobid = params["jobid"]
@@ -35,7 +36,7 @@ class Panconfiguration:
         # Make jobid_path and the necessary directories
         self.jobid_path = self.base_dir / "output" / self.jobid
         if self.jobid_path.exists():
-            shutil.rmtree(self.jobid_path) # Delete previous directory if existing
+            shutil.rmtree(self.jobid_path)  # Delete previous directory if existing
         self.jobid_path.mkdir(parents=True, exist_ok=True)
 
     def skip(self, rate):
