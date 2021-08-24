@@ -18,6 +18,8 @@ class Panconfiguration:
         self.time_start = time.time()
         self.stage = 0
 
+        self.popgenstats_period = 100  # TODO: Make this a user input parameter
+
     def load(self, params):
         """Load parameters from params"""
         self.ECOSYSTEM_NUMBER_ = params["ECOSYSTEM_NUMBER_"]

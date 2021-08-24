@@ -106,8 +106,8 @@ class Ecosystem:
                 headsup = params["MATURATION_AGE"] + params["HEADSUP"]
                 surv_start = self.gstruc["surv"].start
                 repr_start = self.gstruc["repr"].start
-                genomes[:, surv_start : surv_start + headsup] = True
-                genomes[:, repr_start : repr_start + headsup] = True
+                genomes[:, surv_start: surv_start + headsup] = True
+                genomes[:, repr_start: repr_start + headsup] = True
 
             return genomes
 
@@ -147,6 +147,9 @@ class Ecosystem:
                 self.population += self.eggs
                 self.eggs = None
 
+        self.population.step()
+        if pan.stage > pan.popgenstats_period:
+            self.population.pop_size_history.pop(0)
         self.recorder.record_snapshots(self.population)
         self.recorder.record_visor(self.population)
         self.recorder.record_popgenstats(self.population)
@@ -247,7 +250,7 @@ class Ecosystem:
         elif self.REPR_MODE == "sexual":
             origins = np.array(
                 [
-                    f"{self.population.uids[order[2*i]]}.{self.population.uids[order[2*i+1]]}"
+                    f"{self.population.uids[order[2 * i]]}.{self.population.uids[order[2 * i + 1]]}"
                     for i in range(len(order) // 2)
                 ]
             )

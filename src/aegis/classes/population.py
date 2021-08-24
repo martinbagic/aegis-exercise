@@ -58,5 +58,6 @@ class Population:
         return self
 
     def step(self):
+        """Add current population size to population size history"""
         self.pop_size_history.append(len(self))
         return
