@@ -135,6 +135,7 @@ class Recorder:
         if pan.skip(pan.POPGENSTATS_RATE_):
             return
 
+        population.step()
         with open(self.paths["BASE_DIR"] / "popgenstats.csv", "ab") as f:
             array = self.popgenstats.analyze(population)
             np.savetxt(f, [array], delimiter=",", fmt="%1.3e")

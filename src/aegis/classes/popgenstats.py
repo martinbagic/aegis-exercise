@@ -1,3 +1,6 @@
+from statistics import harmonic_mean
+
+
 class PopgenStats:
     def __init__(self):
         pass
@@ -5,7 +8,10 @@ class PopgenStats:
     def analyze(self, population):
         """Calculate and return population genetic statistics"""
 
-        def _stat_example():
-            return len(population)
+        def pop_size():
+            return population.pop_size_history[-1]
 
-        return (_stat_example(),)
+        def pop_size_effective():
+            return harmonic_mean(population.pop_size_history)
+
+        return (pop_size(), pop_size_effective())

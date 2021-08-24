@@ -11,7 +11,7 @@ class Population:
         "uids",
         "births",
         "birthdays",
-        "phenotypes",
+        "phenotypes"
     )
 
     def __init__(self, genomes, ages, origins, uids, births, birthdays, phenotypes):
@@ -22,6 +22,7 @@ class Population:
         self.births = births
         self.birthdays = birthdays
         self.phenotypes = phenotypes
+        self.pop_size_history = []
 
     def __len__(self):
         """Return the number of living individuals"""
@@ -55,3 +56,7 @@ class Population:
             val = np.concatenate([getattr(self, attr), getattr(population, attr)])
             setattr(self, attr, val)
         return self
+
+    def step(self):
+        self.pop_size_history.append(len(self))
+        return
