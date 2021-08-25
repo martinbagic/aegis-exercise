@@ -4,15 +4,7 @@ import numpy as np
 class Population:
     """Wrapper for all population data"""
 
-    attrs = (
-        "genomes",
-        "ages",
-        "origins",
-        "uids",
-        "births",
-        "birthdays",
-        "phenotypes"
-    )
+    attrs = ("genomes", "ages", "origins", "uids", "births", "birthdays", "phenotypes")
 
     def __init__(self, genomes, ages, origins, uids, births, birthdays, phenotypes):
         self.genomes = genomes

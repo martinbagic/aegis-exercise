@@ -106,8 +106,8 @@ class Ecosystem:
                 headsup = params["MATURATION_AGE"] + params["HEADSUP"]
                 surv_start = self.gstruc["surv"].start
                 repr_start = self.gstruc["repr"].start
-                genomes[:, surv_start: surv_start + headsup] = True
-                genomes[:, repr_start: repr_start + headsup] = True
+                genomes[:, surv_start : surv_start + headsup] = True
+                genomes[:, repr_start : repr_start + headsup] = True
 
             return genomes
 
