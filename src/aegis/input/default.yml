@@ -62,7 +62,7 @@ G_muta_evolvable: false
 G_muta_initial: 0.001
 
 # REPRODUCTION
-REPR_MODE: asexual # sexual, asexual, diasexual | Reproduction mode
+REPR_MODE: asexual # sexual, asexual, asexual_diploid | Reproduction mode
 RECOMBINATION_RATE: False # True, False | Is recombination possible?
 
 # MUTATION
