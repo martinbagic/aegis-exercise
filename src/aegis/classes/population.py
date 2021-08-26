@@ -4,15 +4,7 @@ import numpy as np
 class Population:
     """Wrapper for all population data"""
 
-    attrs = (
-        "genomes",
-        "ages",
-        "origins",
-        "uids",
-        "births",
-        "birthdays",
-        "phenotypes",
-    )
+    attrs = ("genomes", "ages", "origins", "uids", "births", "birthdays", "phenotypes")
 
     def __init__(self, genomes, ages, origins, uids, births, birthdays, phenotypes):
         self.genomes = genomes
@@ -22,6 +14,7 @@ class Population:
         self.births = births
         self.birthdays = birthdays
         self.phenotypes = phenotypes
+        self.pop_size_history = []
 
     def __len__(self):
         """Return the number of living individuals"""
@@ -55,3 +48,8 @@ class Population:
             val = np.concatenate([getattr(self, attr), getattr(population, attr)])
             setattr(self, attr, val)
         return self
+
+    def step(self):
+        """Add current population size to population size history"""
+        self.pop_size_history.append(len(self))
+        return
