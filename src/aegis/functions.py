@@ -36,6 +36,7 @@ def get_params(use_cmd, programmatic_params):
     """Extract parameters from multiple sources, document all and combine into final"""
 
     default_cmd_parameters = {
+        "output_path": "aegis_output/",
         "config_files": [],
         "extra_params": [],
         "unpickle_jobid": False,
@@ -45,6 +46,12 @@ def get_params(use_cmd, programmatic_params):
     def get_cmd_params():
         """Parse and process arguments from the command line"""
         parser = argparse.ArgumentParser()
+        parser.add_argument(
+            "-o",
+            "--output_path",
+            type=str,
+            default=default_cmd_parameters["output_path"],
+        )
         parser.add_argument(
             "-e",
             "--extra_params",
@@ -221,6 +228,12 @@ def get_params(use_cmd, programmatic_params):
     final_params.update(programmatic_params)
 
     # Add jobid, config_files, and unpickle_jobid from programmatic_params
+
+    final_params["output_path"] = (
+        programmatic_params["output_path"]
+        if "output_path" in programmatic_params
+        else cmd_params["output_path"]
+    )
 
     final_params["unpickle_jobid"] = (
         programmatic_params["unpickle_jobid"]

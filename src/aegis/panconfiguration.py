@@ -35,7 +35,7 @@ class Panconfiguration:
         self.rng = numpy.random.default_rng(params["RANDOM_SEED_"])
 
         # Make jobid_path and the necessary directories
-        self.jobid_path = self.base_dir / "output" / self.jobid
+        self.jobid_path = pathlib.Path(params["output_path"]) / self.jobid
         if self.jobid_path.exists():
             shutil.rmtree(self.jobid_path)  # Delete previous directory if existing
         self.jobid_path.mkdir(parents=True, exist_ok=True)
