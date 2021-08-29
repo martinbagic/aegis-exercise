@@ -51,6 +51,7 @@ def get_params(use_cmd, programmatic_params):
             "--output_path",
             type=str,
             default=default_cmd_parameters["output_path"],
+            help="relative path to folder in which the parent folder with output data will be created",
         )
         parser.add_argument(
             "-e",
@@ -58,17 +59,20 @@ def get_params(use_cmd, programmatic_params):
             type=str,
             nargs="*",
             default=default_cmd_parameters["extra_params"],
+            help="list of extra parameters that override config parameters",
         )
         parser.add_argument(
             "--jobid",
             type=str,
             default=default_cmd_parameters["jobid"],
+            help="name of the parent folder that will contain all output data"
         )
         parser.add_argument(
             "-r",
             "--unpickle_jobid",
             type=bool,
             default=default_cmd_parameters["unpickle_jobid"],
+            help="use a pickle file to start the simulation from a pre-evolved simulation"
         )
         parser.add_argument(
             "-c",
@@ -76,6 +80,7 @@ def get_params(use_cmd, programmatic_params):
             nargs="*",
             type=str,
             default=default_cmd_parameters["config_files"],
+            help="list of config files that override default parameters"
         )
         return vars(parser.parse_args())
 
