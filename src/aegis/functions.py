@@ -10,6 +10,7 @@ import yaml
 import logging
 import argparse
 import time
+import numpy
 
 import pickle
 
@@ -115,6 +116,9 @@ def get_params(use_cmd, programmatic_params):
         return extra_params
 
     def validate_params(params):
+        # General
+        assert isinstance(params["RANDOM_SEED_"], int)
+
         # Runtime
         assert isinstance(params["CYCLE_NUM_"], int) and params["CYCLE_NUM_"] > 1
         assert isinstance(params["LOGGING_RATE_"], int) and params["LOGGING_RATE_"] >= 1
@@ -238,6 +242,10 @@ def get_params(use_cmd, programmatic_params):
     if final_params["JOBID_TIME_STAMP_"]:
         jobid += f"@{time.time()}"
     final_params["jobid"] = jobid
+
+    # Randomize RANDOM_SEED_ if == 0
+    if final_params["RANDOM_SEED_"] == 0:
+        final_params["RANDOM_SEED_"] = numpy.random.randint(1, 10 ** 6)
 
     # Document all params
     final_params["_sources"] = {

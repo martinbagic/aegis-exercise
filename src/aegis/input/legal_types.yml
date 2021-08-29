@@ -12,6 +12,9 @@ config_files: list
 # GLOBAL PARAMETERS #
 #####################
 
+# GENERAL
+RANDOM_SEED_: int
+
 # RUNTIME
 CYCLE_NUM_: int
 LOGGING_RATE_: int

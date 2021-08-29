@@ -10,8 +10,6 @@ class Panconfiguration:
 
     traits = ("surv", "repr", "neut", "muta")
     base_dir = pathlib.Path(__file__).absolute().parent.parent.parent
-    rng = numpy.random.default_rng(2021)
-
     # stage_cumulative = None  # Number of stages from the first (not pickled) version
 
     def __init__(self):
@@ -32,6 +30,9 @@ class Panconfiguration:
 
         self.unpickle_jobid = params["unpickle_jobid"]
         self.jobid = params["jobid"]
+
+        # Set random number generator
+        self.rng = numpy.random.default_rng(params["RANDOM_SEED_"])
 
         # Make jobid_path and the necessary directories
         self.jobid_path = self.base_dir / "output" / self.jobid

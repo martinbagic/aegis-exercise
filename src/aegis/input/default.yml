@@ -2,6 +2,9 @@
 # GLOBAL PARAMETERS #
 #####################
 
+# GENERAL
+RANDOM_SEED_: 0 # int | 0 to set a random number
+
 # RUNTIME
 CYCLE_NUM_: 1000000 # 1+ | How many stages does the simulation run for?
 LOGGING_RATE_: 500 # 1+ | Log every ?-th stage
