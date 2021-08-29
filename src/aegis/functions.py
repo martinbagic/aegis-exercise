@@ -105,10 +105,13 @@ def get_params(use_cmd, programmatic_params):
             key, val = estring.split("=")
             assert key in config_params, "Key of the extra parameter is not valid"
             # TODO do not copy types from config_params
-            extra_params[key] = type(config_params[key])(
-                val
-            )  # Change type of v using the established types
-            # This will raise an error if the entered parameter is not present in the config parameters
+            param_type = type(config_params[key])
+            if param_type == bool:
+                val = val == "True"
+            else:
+                val = param_type(val)
+
+            extra_params[key] = val  # Change type of v using the established types
         return extra_params
 
     def validate_params(params):
