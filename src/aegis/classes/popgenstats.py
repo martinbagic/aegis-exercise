@@ -1,6 +1,10 @@
 from statistics import harmonic_mean
 
 
+def get_N(pop_size_history):
+    return pop_size_history[-1]
+
+
 def get_Ne(pop_size_history):
     return harmonic_mean(pop_size_history)
 
