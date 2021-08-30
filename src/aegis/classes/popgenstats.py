@@ -9,6 +9,9 @@ def get_Ne(pop_size_history):
     return harmonic_mean(pop_size_history)
 
 
+def allele_frequencies(genomes):
+    return genomes.reshape(genomes.shape[0], -1).mean(0)
+
 # class PopgenStats:
 #     def __init__(self):
 #         pass
