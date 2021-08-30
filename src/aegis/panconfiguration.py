@@ -16,7 +16,7 @@ class Panconfiguration:
         self.time_start = time.time()
         self.stage = 0
 
-    def load(self, params):
+    def load(self, params, derived_params, output_path):
         """Load parameters from params"""
         self.ECOSYSTEM_NUMBER_ = params["ECOSYSTEM_NUMBER_"]
         self.CYCLE_NUM_ = params["CYCLE_NUM_"]
@@ -28,14 +28,14 @@ class Panconfiguration:
         self.FLUSH_RATE_ = params["FLUSH_RATE_"]
         self.POPGENSTATS_RATE_ = params["POPGENSTATS_RATE_"]
 
-        self.unpickle_jobid = params["unpickle_jobid"]
+        # self.unpickle_jobid = params["unpickle_jobid"]
         self.jobid = params["jobid"]
 
         # Set random number generator
         self.rng = numpy.random.default_rng(params["RANDOM_SEED_"])
 
         # Make jobid_path and the necessary directories
-        self.jobid_path = pathlib.Path(params["output_path"]) / self.jobid
+        self.jobid_path = output_path / self.jobid
         if self.jobid_path.exists():
             shutil.rmtree(self.jobid_path)  # Delete previous directory if existing
         self.jobid_path.mkdir(parents=True, exist_ok=True)
@@ -44,6 +44,8 @@ class Panconfiguration:
         """Should you skip an action performed at a certain rate"""
         return (rate <= 0) or (self.stage % rate > 0)
 
+    def parse(self):
+        pass
 
 # Initialize empty Panconfiguration which can then be populated by parameters
 pan = Panconfiguration()
