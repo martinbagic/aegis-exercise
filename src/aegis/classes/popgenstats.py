@@ -21,7 +21,10 @@ def genotype_frequencies(genomes, REPR_MODE):
         len_pop = genomes.shape[0]
 
         genotypes_raw = genomes.reshape(-1, 2).sum(1).reshape(len_pop, -1).transpose()
-        genotype_freqs = np.array([np.bincount(x, minlength=3) for x in genotypes_raw]).reshape(-1) / len_pop
+        genotype_freqs = (
+            np.array([np.bincount(x, minlength=3) for x in genotypes_raw]).reshape(-1)
+            / len_pop
+        )
 
         return genotype_freqs
 

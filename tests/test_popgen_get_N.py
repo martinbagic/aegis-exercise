@@ -12,7 +12,7 @@ from aegis.classes import popgenstats
         ([100], 100),
         ([100, 200, 300, 400], 400),
         (np.array([100]), 100),
-        (np.array([100, 200, 300, 400]), 400)
+        (np.array([100, 200, 300, 400]), 400),
     ],
 )
 def test_get_N_valid_input(get_N_valid_input, expected):

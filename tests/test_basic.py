@@ -25,7 +25,13 @@ def compare(filepath, path_generated, path_reference):
 def test_basic():
 
     jobid = "test_basic"
-    aegis.run(use_cmd=False, CYCLE_NUM_=2021, jobid=jobid, JOBID_TIME_STAMP_=False, config_files=[])
+    aegis.run(
+        use_cmd=False,
+        CYCLE_NUM_=2021,
+        jobid=jobid,
+        JOBID_TIME_STAMP_=False,
+        config_files=[],
+    )
 
     for filepath in (
         "genotypes.csv",
