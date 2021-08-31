@@ -85,8 +85,7 @@ class Reproducer:
         # Copy second chromosome of second parent onto the second chromosome of the children
         # Thus, children have the first chromosomes from the first parents and the second chromosomes from the second parents
         assorted[::2, :, 1::2] = assorted[1::2, :, 1::2]
-        # assorted = assorted[::2]
-        assorted = assorted[1::2]
+        assorted = assorted[::2]
 
         return assorted, order
 
