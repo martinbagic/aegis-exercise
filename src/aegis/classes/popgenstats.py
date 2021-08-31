@@ -31,6 +31,49 @@ def genotype_frequencies(genomes, REPR_MODE):
     return allele_frequencies(genomes)
 
 
+def mean_H_per_bit(genomes, REPR_MODE):
+    """Output: [Hloc1_bit1, Hloc1_bit2, ...] Entries: (bits_per_locus // 2) * nloci"""
+    if REPR_MODE != "asexual":
+        return genotype_frequencies(genomes, REPR_MODE)[1::3]
+
+    return np.array([])
+
+
+def mean_H_per_locus(genomes, REPR_MODE):
+    """Output: [Hloc1, Hloc2, ...] Entries: nloci"""
+    if REPR_MODE != "asexual":
+        H = mean_H_per_bit(genomes, REPR_MODE)
+        return H.reshape(-1, genomes.shape[2] >> 1).mean(1)
+
+    return np.array([])
+
+
+def mean_H(genomes, REPR_MODE):
+    """Output: H"""
+    if REPR_MODE != "asexual":
+        return mean_H_per_bit(genomes, REPR_MODE).mean()
+
+    return np.array([])
+
+
+def mean_H_per_bit_expected(genomes, REPR_MODE):
+    """Output: [Heloc1_bit1, Heloc1_bit2, ...] Entries: (bits_per_locus // 2) * nloci"""
+    if REPR_MODE != "asexual":
+        genotype_freqs_sqrd = genotype_frequencies(genomes, REPR_MODE) ** 2
+        sum_each_locus = genotype_freqs_sqrd.reshape(-1, 3).sum(1)
+        return 1 - sum_each_locus
+
+    return np.array([])
+
+
+def mean_H_expected(genomes, REPR_MODE):
+    """Output: He"""
+    if REPR_MODE != "asexual":
+        return mean_H_per_bit_expected(genomes, REPR_MODE).mean()
+
+    return np.array([])
+
+
 # class PopgenStats:
 #     def __init__(self):
 #         pass
