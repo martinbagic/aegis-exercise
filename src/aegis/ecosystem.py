@@ -1,14 +1,15 @@
 import numpy as np
+import logging
 
-from aegis.classes.interpreter import Interpreter
-from aegis.classes.reproducer import Reproducer
-from aegis.classes.overshoot import Overshoot
-from aegis.classes.pleiotropy import Pleiotropy
-from aegis.classes.recorder import Recorder
-from aegis.classes.season import Season
-from aegis.classes.environment import Environment
-from aegis.classes.gstruc import Gstruc
-from aegis.classes.population import Population
+from aegis.modules.interpreter import Interpreter
+from aegis.modules.reproducer import Reproducer
+from aegis.modules.overshoot import Overshoot
+from aegis.modules.pleiotropy import Pleiotropy
+from aegis.modules.recorder import Recorder
+from aegis.modules.season import Season
+from aegis.modules.environment import Environment
+from aegis.modules.gstruc import Gstruc
+from aegis.modules.population import Population
 
 from aegis.panconfiguration import pan
 
@@ -16,70 +17,69 @@ from aegis.panconfiguration import pan
 class Ecosystem:
     """Container for one ecosystem"""
 
-    ecosystem_id = 1
+    def __init__(self, id, population=None):
 
-    def __init__(self, params, population=None):
+        self.id = id
 
-        self.ecosystem_id = Ecosystem.ecosystem_id
-        Ecosystem.ecosystem_id += 1
-
-        # Save ecosystem parameters
-        self.MAX_LIFESPAN = params["MAX_LIFESPAN"]  # used in self.age()
-        self.MATURATION_AGE = params["MATURATION_AGE"]  # used in self.reproduction()
-        self.REPR_MODE = params["REPR_MODE"]  # used in self.reproduction()
+        logging.info(f"Initialized ecosystem {self.id}")
 
         # Initialize ecosystem variables
         self.max_uid = 0  # ID of the most recently born individual
 
         # Initialize recorder
         self.recorder = Recorder(
-            ecosystem_id=self.ecosystem_id,
-            MAX_LIFESPAN=params["MAX_LIFESPAN"],
+            ecosystem_id=self.id,
+            MAX_LIFESPAN=self._get_param("MAX_LIFESPAN"),
         )
-        self.recorder.record_input_summary(params)  # Record input summary
+        # self.recorder.record_input_summary(params)  # TODO Record random number generator
 
         # Initialize genome structure
-        self.gstruc = Gstruc(params)  # TODO you cannot pass params
+        self.gstruc = Gstruc(
+            pan.params_list[self.id]
+        )  # TODO You should not pass all parameters
 
         # Initialize reproducer
         self.reproducer = Reproducer(
-            RECOMBINATION_RATE=params["RECOMBINATION_RATE"],
-            MUTATION_RATIO=params["MUTATION_RATIO"],
+            RECOMBINATION_RATE=self._get_param("RECOMBINATION_RATE"),
+            MUTATION_RATIO=self._get_param("MUTATION_RATIO"),
         )
 
         # Initialize season
-        self.season = Season(DISCRETE_GENERATIONS=params["DISCRETE_GENERATIONS"])
+        self.season = Season(
+            DISCRETE_GENERATIONS=self._get_param("DISCRETE_GENERATIONS")
+        )
 
         # Initialize interpreter
         self.interpreter = Interpreter(
-            BITS_PER_LOCUS=params["BITS_PER_LOCUS"],
-            REPR_MODE=params["REPR_MODE"],
+            BITS_PER_LOCUS=self._get_param("BITS_PER_LOCUS"),
+            REPR_MODE=self._get_param("REPR_MODE"),
         )
 
         # Initialize pleiotropy
         self.pleiotropy = (
             Pleiotropy(
-                PLEIOTROPY_SPECS=params["PLEIOTROPY_SPECS"], pos_end=self.gstruc.length
+                PLEIOTROPY_SPECS=self._get_param("PLEIOTROPY_SPECS"),
+                pos_end=self.gstruc.length,
             )
-            if params["PLEIOTROPY_SPECS"] != []
+            if self._get_param("PLEIOTROPY_SPECS") != []
             else Pleiotropy()
         )
 
         # Initialize overshoot
         self.overshoot = Overshoot(
-            OVERSHOOT_EVENT=params["OVERSHOOT_EVENT"],
-            MAX_POPULATION_SIZE=params["MAX_POPULATION_SIZE"],
-            CLIFF_SURVIVORSHIP=params["CLIFF_SURVIVORSHIP"],
+            OVERSHOOT_EVENT=self._get_param("OVERSHOOT_EVENT"),
+            MAX_POPULATION_SIZE=self._get_param("MAX_POPULATION_SIZE"),
+            CLIFF_SURVIVORSHIP=self._get_param("CLIFF_SURVIVORSHIP"),
         )
 
         # Initialize environmental map
         self.environment = (
             Environment(
-                BITS_PER_LOCUS=params["BITS_PER_LOCUS"],
+                BITS_PER_LOCUS=self._get_param("BITS_PER_LOCUS"),
                 total_loci=self.gstruc.length,
-                ENVIRONMENT_CHANGE_RATE=params["ENVIRONMENT_CHANGE_RATE"],
+                ENVIRONMENT_CHANGE_RATE=self._get_param("ENVIRONMENT_CHANGE_RATE"),
             )
-            if params["ENVIRONMENT_CHANGE_RATE"] > 0
+            if self._get_param("ENVIRONMENT_CHANGE_RATE") > 0
             else Environment()
         )
 
@@ -89,9 +89,9 @@ class Ecosystem:
             # Make a genome array with random values
             genomes = pan.rng.random(
                 size=(
-                    params["MAX_POPULATION_SIZE"],
+                    self._get_param("MAX_POPULATION_SIZE"),
                     self.gstruc.length,
-                    params["BITS_PER_LOCUS"],
+                    self._get_param("BITS_PER_LOCUS"),
                 )
             )
 
@@ -102,8 +102,8 @@ class Ecosystem:
             genomes = genomes.astype(bool)
 
             # Guarantee survival and reproduction values up to first few mature ages
-            if params["HEADSUP"] > -1:
-                headsup = params["MATURATION_AGE"] + params["HEADSUP"]
+            if self._get_param("HEADSUP") > -1:
+                headsup = self._get_param("MATURATION_AGE") + self._get_param("HEADSUP")
                 surv_start = self.gstruc["surv"].start
                 repr_start = self.gstruc["repr"].start
                 genomes[:, surv_start : surv_start + headsup] = True
@@ -113,7 +113,7 @@ class Ecosystem:
 
         def _get_pop():
             if population is None:
-                num = params["MAX_POPULATION_SIZE"]
+                num = self._get_param("MAX_POPULATION_SIZE")
 
                 genomes = _initialize_genomes()
                 ages = np.zeros(num, int)
@@ -196,7 +196,7 @@ class Ecosystem:
     def age(self):
         """Increase age of all by one and kill those that surpass max lifespan"""
         self.population.ages += 1
-        mask_kill = self.population.ages >= self.MAX_LIFESPAN
+        mask_kill = self.population.ages >= self._get_param("MAX_LIFESPAN")
         self._kill(mask_kill=mask_kill, causeofdeath="max_lifespan")
 
     def eco_survival(self):
@@ -214,7 +214,7 @@ class Ecosystem:
         """Let individuals reproduce"""
 
         # Check if mature
-        mask_mature = self.population.ages >= self.MATURATION_AGE
+        mask_mature = self.population.ages >= self._get_param("MATURATION_AGE")
         if not any(mask_mature):
             return
 
@@ -233,7 +233,7 @@ class Ecosystem:
 
         # Copy genomes of parents and modify
         genomes = self.population.genomes[mask_repr]
-        if self.REPR_MODE == "sexual":
+        if self._get_param("REPR_MODE") == "sexual":
             genomes = self.reproducer.recombine(genomes)
             genomes, order = self.reproducer.assort(genomes)
 
@@ -242,9 +242,9 @@ class Ecosystem:
         genomes = self.reproducer.mutate(genomes, muta_prob)
 
         # Get origins
-        if self.REPR_MODE in ("asexual", "asexual_diploid"):
+        if self._get_param("REPR_MODE") in ("asexual", "asexual_diploid"):
             origins = self.population.uids[mask_repr]
-        elif self.REPR_MODE == "sexual":
+        elif self._get_param("REPR_MODE") == "sexual":
             origins = np.array(
                 [
                     f"{self.population.uids[order[2*i]]}.{self.population.uids[order[2*i+1]]}"
@@ -359,7 +359,7 @@ class Ecosystem:
         #     if self.macroconfig.REC_EVERY_NTH > 1
         #     else mask_kill
         # )
-        # self.recorder.rec(self.population[mask_record], causeofdeath, self.ecosystem_id)
+        # self.recorder.rec(self.population[mask_record], causeofdeath, self.id)
 
         # Retain survivors
         self.population *= ~mask_kill
@@ -371,3 +371,7 @@ class Ecosystem:
             if self.eggs is not None
             else len(self.population)
         )
+
+    def _get_param(self, param):
+        """Get parameter value for this specific ecosystem"""
+        return pan.params_list[self.id][param]

@@ -6,7 +6,7 @@ import time
 import copy
 
 from aegis.panconfiguration import pan
-from aegis.classes.popgenstats import PopgenStats
+from aegis.modules.popgenstats import PopgenStats
 
 # TODO maybe don't record phenotypic data, instead transform the genotypic data to phenotypic when necessary
 
@@ -32,7 +32,7 @@ class Recorder:
     def __init__(self, ecosystem_id, MAX_LIFESPAN):
         # Define output paths and make necessary directories
 
-        opath = pan.jobid_path / str(ecosystem_id)
+        opath = pan.output_path / str(ecosystem_id)
 
         self.paths = {
             "BASE_DIR": opath,
@@ -52,6 +52,7 @@ class Recorder:
             "age_at_birth": [0] * MAX_LIFESPAN,
             "age_at_overshoot": [0] * MAX_LIFESPAN,
             "age_at_genetic": [0] * MAX_LIFESPAN,
+            "age_at_season_shift": [0] * MAX_LIFESPAN,
             "cumulative_ages": [0] * MAX_LIFESPAN,
             "age_at_end_of_sim": [0] * MAX_LIFESPAN,
         }

@@ -3,14 +3,13 @@
 #####################
 
 # GENERAL
-RANDOM_SEED_: 0 # int | 0 to set a random number
+RANDOM_SEED_: # int, none | If nothing is given, a random integer will be used as the seed; otherwise the given integer will be used as the seed
 
 # RUNTIME
 CYCLE_NUM_: 1000000 # 1+ | How many stages does the simulation run for?
 LOGGING_RATE_: 500 # 1+ | Log every ?-th stage
 
 # RECORDING
-JOBID_TIME_STAMP_: True # True, False | Add time stamp to output/{jobid} directory
 PICKLE_RATE_: 500 # 0+ | Pickle population every ? stages; 0 for no pickles
 SNAPSHOT_RATE_: 1000 # 0+ | Take a snapshot every ? stages; 0 for no snapshots
 VISOR_RATE_: 50 # 0+ | Take a visor snapshot every ? stages; 0 for no visor records
@@ -65,8 +64,8 @@ G_muta_evolvable: false
 G_muta_initial: 0.001
 
 # REPRODUCTION
-REPR_MODE: asexual # sexual, asexual, diasexual | Reproduction mode
-RECOMBINATION_RATE: False # True, False | Is recombination possible?
+REPR_MODE: asexual # sexual, asexual, asexual_diploid | Reproduction mode
+RECOMBINATION_RATE: False # True, False | Rate of recombination
 
 # MUTATION
 MUTATION_RATIO: 0.1 # real 0+ | Ratio of beneficial mutations to detrimental mutations

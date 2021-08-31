@@ -4,13 +4,6 @@ from aegis.panconfiguration import pan
 
 
 class Reproducer:
-
-    legal = (
-        "sexual",
-        "asexual",
-        "asexual_diploid",
-    )  # Decision forking actually in ecosystem.py
-
     def __init__(self, RECOMBINATION_RATE, MUTATION_RATIO):
         self.RECOMBINATION_RATE = RECOMBINATION_RATE
         self.MUTATION_RATIO = MUTATION_RATIO
@@ -92,7 +85,8 @@ class Reproducer:
         # Copy second chromosome of second parent onto the second chromosome of the children
         # Thus, children have the first chromosomes from the first parents and the second chromosomes from the second parents
         assorted[::2, :, 1::2] = assorted[1::2, :, 1::2]
-        assorted = assorted[::2]
+        # assorted = assorted[::2]
+        assorted = assorted[1::2]
 
         return assorted, order
 

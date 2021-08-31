@@ -1,5 +1,6 @@
 .ONESHELL:
 
+
 all: venv test
 
 venv:
@@ -11,10 +12,14 @@ venv:
 	python3 setup.py bdist_wheel sdist
 	python3 -m pip install -e .
 
-test:
-	echo "\n***\n"
+testnew: generate test
+
+generate:
 	. .venv/bin/activate
-	python3 -m pytest tests/ --log-cli-level=DEBUG
+	python3 tests/generate.py
+
+test:
+	pytest tests/ --log-cli-level=DEBUG
 
 manifest:
 	check-manifest --create

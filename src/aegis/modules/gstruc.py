@@ -1,5 +1,4 @@
 from aegis.panconfiguration import pan
-from aegis.classes.interpreter import Interpreter
 
 
 class Gstruc:
@@ -7,7 +6,7 @@ class Gstruc:
 
     def __init__(self, params):
 
-        self.traits = {name: Trait(name, params) for name in pan.traits}
+        self.traits = {name: Trait(name, params) for name in Trait.legal}
         self.evolvable = [trait for trait in self.traits.values() if trait.evolvable]
         self.length = 0
 
@@ -27,6 +26,8 @@ class Gstruc:
 
 class Trait:
     """Genetic trait"""
+
+    legal = ("surv", "repr", "neut", "muta")
 
     def __init__(self, name, params):
         def get(key):
@@ -57,7 +58,14 @@ class Trait:
 
         if self.evolvable:
             assert isinstance(self.agespec, bool)
-            assert self.interpreter in Interpreter.legal
+            assert self.interpreter in (
+                "uniform",
+                "exp",
+                "binary",
+                "binary_exp",
+                "binary_switch",
+                "switch",
+            )
             assert 0 <= self.lo <= 1
             assert 0 <= self.hi <= 1
 

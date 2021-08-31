@@ -1,5 +1,4 @@
-# This script is executed when you run `aegis` in your command line.
+# This script is executed when you run `aegis {path/to/config_file}` in your command line.
 
-import aegis
-
-aegis.run(True)
+from aegis import __main__
+__main__.main()

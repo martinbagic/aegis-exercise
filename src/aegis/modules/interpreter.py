@@ -2,13 +2,10 @@ import numpy as np
 
 from aegis.panconfiguration import pan
 
-import logging
-
 
 class Interpreter:
     """Class for transforming locus bits into gene activities"""
 
-    legal = ("uniform", "exp", "binary", "binary_exp", "binary_switch", "switch")
 
     def __init__(self, BITS_PER_LOCUS, REPR_MODE):
         self.ploidy = {"sexual": 2, "asexual": 1, "asexual_diploid": 2}[REPR_MODE]
