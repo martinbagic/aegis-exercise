@@ -4,8 +4,7 @@ output
 temp
 old
 ipynb
-# tests/generated/*/
-tests
+tests/generated/*/
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
