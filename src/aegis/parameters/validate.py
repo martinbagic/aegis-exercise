@@ -64,10 +64,10 @@ def validate_values(params):
     # Mutation
     assert params["MUTATION_RATIO"] >= 0
 
-    # Pleiotropy
-    assert isinstance(params["PLEIOTROPY_SPECS"], list)
+    # Phenomap
+    assert isinstance(params["PHENOMAP_SPECS"], list)
 
-    for triple in params["PLEIOTROPY_SPECS"]:
+    for triple in params["PHENOMAP_SPECS"]:
         assert 0 <= triple[0] < params["MAX_LIFESPAN"]  # genotype index
         assert 0 <= triple[1] < params["MAX_LIFESPAN"]  # phenotype index
         assert isinstance(triple[2], (int, float))  # weight
