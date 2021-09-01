@@ -74,6 +74,25 @@ def mean_H_expected(genomes, REPR_MODE):
     return np.array([])
 
 
+def get_mu(G_muta_initial, G_muta_evolvable):
+    """Return equivalent of mutation rate µ per gene per generation -> AEGIS-'Locus' interpreted as a gene"""
+    if G_muta_evolvable:
+        return G_muta_initial  # TODO: Replace with value from phenotype
+
+    return G_muta_initial
+
+
+def get_theta(G_muta_initial, G_muta_evolvable, REPR_MODE, pop_size_history):
+    """Returns the adjusted mutation rate theta = 4 * Ne * µ"""
+    ploidy_factor = 4 if REPR_MODE != "asexual" else 2
+    theta = (
+        ploidy_factor
+        * get_Ne(pop_size_history)
+        * get_mu(G_muta_initial, G_muta_evolvable)
+    )
+    return theta
+
+
 # class PopgenStats:
 #     def __init__(self):
 #         pass
