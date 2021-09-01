@@ -5,6 +5,7 @@ temp
 old
 ipynb
 tests/generated/*/
+tests/run
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

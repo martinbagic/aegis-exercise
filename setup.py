@@ -1,22 +1,26 @@
 import setuptools
+import pathlib
+
+# TODO add entry points
+
 
 setuptools.setup(
     name="aging-of-evolving-genomes",
-    version="2.0.3",
+    version="2.0.11",
     description="",
-    author="Martin Bagic, Will Bradshaw, Arian Sajina and Dario Valenzano",
+    long_description=(pathlib.Path(__file__).parent / "README.md").read_text(),
+    long_description_content_type="text/markdown",
+    author="Martin Bagic, Will Bradshaw, Arian Šajina and Dario Valenzano",
     author_email="martin.bagic@outlook.com, wbradshaw@age.mpg.de, asajina@age.mpg.de, Dario.Valenzano@age.mpg.de",
     url="https://github.com/valenzano-lab/aegis",
     package_dir={"": "src"},
-    packages=["aegis"],
-    python_requires=">=3.8",
-    scripts=["scripts/aegis"],
-    install_requires=[
-        "pip>=21.2.4",
-        "numpy>=1.21.2",
-        "pandas>=1.3.2",
-        "pyyaml>=5.4.1",
-        "pyarrow>=5.0.0",
-    ],
+    packages=["aegis", "aegis.modules", "aegis.parameters"],
+    package_data={
+        "aegis": ["parameters/default.yml"],
+        "": ["tests/generated/*.yml", "tests/reference/*", "tests/generate.py"],
+    },
+    python_requires=">=3.6",
+    entry_points={"console_scripts": ["aegis = aegis.__main__:main"]},
+    install_requires=["numpy", "pandas", "PyYAML", "pyarrow"],
     extras_require={"dev": ["pytest==6.2.4"]},
 )

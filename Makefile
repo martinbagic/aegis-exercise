@@ -14,6 +14,11 @@ venv:
 
 testnew: generate test
 
+testrun:
+	python3 setup.py
+	python3 -m pip install -e .
+	python3 -m aegis tests/run/test_run.yml
+
 generate:
 	. .venv/bin/activate
 	python3 tests/generate.py
@@ -23,17 +28,23 @@ test:
 	pytest tests/ --log-cli-level=DEBUG
 
 manifest:
+	python3 -m pip install check-manifest
 	check-manifest --create
 
+packaging_installation: 
+	python3 -m pip install twine wheel
 
-packaging:
-	python3 -m pip install wheel
+package:
+	python3 -m pip install twine wheel
+	rm -rf dist/*
 	python3 setup.py sdist bdist_wheel
 	twine check dist/*
 
 uploadtest:
-	python3 -m pip install twine
 	twine upload --repository testpypi dist/*
 
 uploadreal:
 	twine upload dist/*
+
+testinstall:
+	python3 -m pip install --index-url https://test.pypi.org/simple --extra-index-url https://pypi.org/simple aging-of-evolving-genomes
