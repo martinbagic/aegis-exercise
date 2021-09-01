@@ -29,7 +29,7 @@ class Panconfiguration:
         pass
 
     def init(self, custom_config_path=None):
-        self.base_dir = pathlib.Path(__file__).absolute().parent.parent.parent
+        self.here = pathlib.Path(__file__).absolute().parent
         self.stage = 0
         self.time_start = time.time()
 
@@ -55,9 +55,7 @@ class Panconfiguration:
             custom_config_params = read_yml(custom_config_path)
 
             # Read config parameters from the default config file
-            default_config_params = read_yml(
-                self.base_dir / "src/aegis/parameters/default.yml"
-            )
+            default_config_params = read_yml(self.here / "parameters/default.yml")
 
             # Fuse
             params = {}
