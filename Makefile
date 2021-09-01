@@ -19,7 +19,21 @@ generate:
 	python3 tests/generate.py
 
 test:
+	python3 -m pip install pytest
 	pytest tests/ --log-cli-level=DEBUG
 
 manifest:
 	check-manifest --create
+
+
+packaging:
+	python3 -m pip install wheel
+	python3 setup.py sdist bdist_wheel
+	twine check dist/*
+
+uploadtest:
+	python3 -m pip install twine
+	twine upload --repository testpypi dist/*
+
+uploadreal:
+	twine upload dist/*
