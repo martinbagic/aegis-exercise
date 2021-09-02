@@ -172,7 +172,7 @@ class Ecosystem:
             _hatch_eggs(self)
 
         # Evolve environment if applicable
-        self.environment.evolve(stage=pan.stage)
+        self.environment.evolve()
 
         # Pickle self
         self.recorder.record_pickle(self)

@@ -1,5 +1,3 @@
-# Caution! Environment also needs to be pickled.
-
 import numpy as np
 
 from aegis.panconfiguration import pan
@@ -12,6 +10,7 @@ class Environment:
         self, BITS_PER_LOCUS=None, total_loci=None, ENVIRONMENT_CHANGE_RATE=None
     ):
 
+        # If no arguments are passed, this class does not do anything
         if (
             BITS_PER_LOCUS is None
             and total_loci is None
@@ -27,7 +26,7 @@ class Environment:
         """Return the genomes reinterpreted in the current environment"""
         return genomes if self.fake else np.logical_xor(self.map_, genomes)
 
-    def evolve(self, stage):
+    def evolve(self):
         """Modify the environmental map"""
         if self.fake:
             return
