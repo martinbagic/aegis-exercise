@@ -47,4 +47,9 @@ uploadreal:
 	twine upload dist/*
 
 testinstall:
+	deactivate
+	rm -rf temp/venv
+	python3 -m venv temp/venv
+	. temp/venv/bin/activate
+	python3 -m pip install --upgrade pip
 	python3 -m pip install --index-url https://test.pypi.org/simple --extra-index-url https://pypi.org/simple aging-of-evolving-genomes
