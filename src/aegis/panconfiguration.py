@@ -54,7 +54,7 @@ class Panconfiguration:
             # Read config parameters from the custom config file
             custom_config_params = read_yml(custom_config_path)
 
-            if custom_config_params is None: # If config file is empty
+            if custom_config_params is None:  # If config file is empty
                 custom_config_params = {}
 
             # Read config parameters from the default config file
@@ -75,7 +75,7 @@ class Panconfiguration:
             parsed_args = run_parser()
             custom_config_path = pathlib.Path(parsed_args.custom_config_path).absolute()
 
-        logging.info(f"Custom config path = {custom_config_path}")
+        logging.info(f"Custom config path = %s", custom_config_path)
 
         # Get parameters
         params = get_params(custom_config_path)
@@ -123,7 +123,7 @@ class Panconfiguration:
 
         # Log progress
         def log_progress():
-            logging.info(f"{self.stage:8} / {self.CYCLE_NUM_}")
+            logging.info(f"%8s / %s", self.stage, self.CYCLE_NUM_)
             eta, sper1M, runtime, stgmin = get_time_estimations()
 
             content = (self.stage, eta, sper1M, runtime, stgmin)

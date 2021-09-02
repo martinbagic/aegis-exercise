@@ -21,7 +21,7 @@ class Ecosystem:
 
         self.id = id
 
-        logging.info(f"Initialized ecosystem {self.id}")
+        logging.info("Initialized ecosystem %s", self.id)
 
         # Initialize ecosystem variables
         self.max_uid = 0  # ID of the most recently born individual
