@@ -54,6 +54,9 @@ class Panconfiguration:
             # Read config parameters from the custom config file
             custom_config_params = read_yml(custom_config_path)
 
+            if custom_config_params is None: # If config file is empty
+                custom_config_params = {}
+
             # Read config parameters from the default config file
             default_config_params = read_yml(self.here / "parameters/default.yml")
 
