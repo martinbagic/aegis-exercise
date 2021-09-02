@@ -56,9 +56,17 @@ G_repr_hi: 0.5
 G_repr_initial: 1
 
 G_neut_evolvable: false
+G_neut_agespec: false
+G_neut_interpreter: binary
+G_neut_lo: 0
+G_neut_hi: 1
 G_neut_initial: 1
 
-G_muta_evolvable: false
+G_muta_evolvable: true
+G_muta_agespec: false
+G_muta_interpreter: binary_exp
+G_muta_lo: 0
+G_muta_hi: 0.1
 G_muta_initial: 0.001
 
 # REPRODUCTION
