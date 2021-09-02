@@ -10,25 +10,25 @@ class Environment:
         self, BITS_PER_LOCUS=None, total_loci=None, ENVIRONMENT_CHANGE_RATE=None
     ):
 
-        # If no arguments are passed, this class does not do anything
+        # If no arguments are passed, this class becomes a dummy that does not do anything
         if (
             BITS_PER_LOCUS is None
             and total_loci is None
             and ENVIRONMENT_CHANGE_RATE is None
         ):
-            self.fake = True
+            self.dummy = True
         else:
-            self.fake = False
+            self.dummy = False
             self.map_ = np.zeros((total_loci, BITS_PER_LOCUS), bool)
             self.ENVIRONMENT_CHANGE_RATE = ENVIRONMENT_CHANGE_RATE
 
     def __call__(self, genomes):
         """Return the genomes reinterpreted in the current environment"""
-        return genomes if self.fake else np.logical_xor(self.map_, genomes)
+        return genomes if self.dummy else np.logical_xor(self.map_, genomes)
 
     def evolve(self):
         """Modify the environmental map"""
-        if self.fake:
+        if self.dummy:
             return
 
         if not pan.skip(self.ENVIRONMENT_CHANGE_RATE):
