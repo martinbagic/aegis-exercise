@@ -1,10 +1,10 @@
 class Season:
     """Class that keeps track when the season ends"""
 
-    def __init__(self, DISCRETE_GENERATIONS):
-        self.countdown = DISCRETE_GENERATIONS if DISCRETE_GENERATIONS else float("inf")
-        self.DISCRETE_GENERATIONS = DISCRETE_GENERATIONS
+    def __init__(self, STAGES_PER_SEASON):
+        self.countdown = float("inf") if STAGES_PER_SEASON == 0 else STAGES_PER_SEASON
+        self.STAGES_PER_SEASON = STAGES_PER_SEASON
 
-    def reset(self):
+    def start_new(self):
         """Reset the season length tracker"""
-        self.countdown += self.DISCRETE_GENERATIONS
+        self.countdown += self.STAGES_PER_SEASON

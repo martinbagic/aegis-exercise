@@ -1,5 +1,5 @@
 import pathlib
-import pandas
+import pandas as pd
 import pytest
 
 base_path = pathlib.Path(__file__).absolute().parent
@@ -24,14 +24,14 @@ def test_scenario(conf):
     #     assert text_reference == text_generated
 
     def compare_csv(subpath):
-        df_generated = pandas.read_csv(path_generated / subpath)
-        df_reference = pandas.read_csv(path_reference / subpath)
-        pandas.testing.assert_frame_equal(df_generated, df_reference)
+        df_generated = pd.read_csv(path_generated / subpath)
+        df_reference = pd.read_csv(path_reference / subpath)
+        pd.testing.assert_frame_equal(df_generated, df_reference)
 
     def compare_feather(subpath):
-        df_generated = pandas.read_feather(path_generated / subpath)
-        df_reference = pandas.read_feather(path_reference / subpath)
-        pandas.testing.assert_frame_equal(df_generated, df_reference)
+        df_generated = pd.read_feather(path_generated / subpath)
+        df_reference = pd.read_feather(path_reference / subpath)
+        pd.testing.assert_frame_equal(df_generated, df_reference)
 
     # compare_text("progress.log")
 

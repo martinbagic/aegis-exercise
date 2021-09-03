@@ -35,14 +35,14 @@ class Trait:
         self.name = name
 
         if self.evolvable:
-            self.agespec = get("agespec")
+            self.agespecific = get("agespecific")
             self.interpreter = get("interpreter")
             self.lo = get("lo")
             self.hi = get("hi")
 
             # Number of loci needed to encode this trait is 1 if the trait is not evolvable
             #   and MAX_LIFESPAN if it is evolvable
-            self.length = params["MAX_LIFESPAN"] if self.agespec else 1
+            self.length = params["MAX_LIFESPAN"] if self.agespecific else 1
 
         else:
             self.length = 0
@@ -54,7 +54,7 @@ class Trait:
         assert 0 <= self.initial <= 1
 
         if self.evolvable:
-            assert isinstance(self.agespec, bool)
+            assert isinstance(self.agespecific, bool)
             assert self.interpreter in (
                 "uniform",
                 "exp",

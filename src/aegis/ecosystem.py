@@ -45,14 +45,12 @@ class Ecosystem:
         )
 
         # Initialize season
-        self.season = Season(
-            DISCRETE_GENERATIONS=self._get_param("DISCRETE_GENERATIONS")
-        )
+        self.season = Season(STAGES_PER_SEASON=self._get_param("STAGES_PER_SEASON"))
 
         # Initialize interpreter
         self.interpreter = Interpreter(
             BITS_PER_LOCUS=self._get_param("BITS_PER_LOCUS"),
-            REPR_MODE=self._get_param("REPR_MODE"),
+            REPRODUCTION_MODE=self._get_param("REPRODUCTION_MODE"),
         )
 
         # Initialize phenomap
@@ -129,7 +127,7 @@ class Ecosystem:
                 return population
 
         self.population = _get_pop()
-        self.eggs = None  # for discrete generations
+        self.eggs = None  # for non-overlapping generations
 
     ##############
     # MAIN LOGIC #
@@ -165,7 +163,7 @@ class Ecosystem:
             mask_kill = np.ones(len(self.population), bool)
             self._kill(mask_kill, "season_shift")
             _hatch_eggs(self)
-            self.season.reset()
+            self.season.start_new()
 
         elif self.season.countdown == float("inf"):
             # Add newborns to population
@@ -233,7 +231,7 @@ class Ecosystem:
 
         # Copy genomes of parents and modify
         genomes = self.population.genomes[mask_repr]
-        if self._get_param("REPR_MODE") == "sexual":
+        if self._get_param("REPRODUCTION_MODE") == "sexual":
             genomes = self.reproducer.recombine(genomes)
             genomes, order = self.reproducer.assort(genomes)
 
@@ -242,9 +240,9 @@ class Ecosystem:
         genomes = self.reproducer.mutate(genomes, muta_prob)
 
         # Get origins
-        if self._get_param("REPR_MODE") in ("asexual", "asexual_diploid"):
+        if self._get_param("REPRODUCTION_MODE") in ("asexual", "asexual_diploid"):
             origins = self.population.uids[mask_repr]
-        elif self._get_param("REPR_MODE") == "sexual":
+        elif self._get_param("REPRODUCTION_MODE") == "sexual":
             origins = np.array(
                 [
                     f"{self.population.uids[order[2*i]]}.{self.population.uids[order[2*i+1]]}"
@@ -324,7 +322,7 @@ class Ecosystem:
         # second and third scenario
         if trait.evolvable:
             which_loci = trait.start
-            if trait.agespec:
+            if trait.agespecific:
                 which_loci += self.population.ages[which_individuals]
 
             probs = self.population.phenotypes[which_individuals, which_loci]

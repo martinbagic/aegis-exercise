@@ -6,8 +6,10 @@ from aegis.panconfiguration import pan
 class Interpreter:
     """Class for transforming locus bits into gene activities"""
 
-    def __init__(self, BITS_PER_LOCUS, REPR_MODE):
-        self.ploidy = {"sexual": 2, "asexual": 1, "asexual_diploid": 2}[REPR_MODE]
+    def __init__(self, BITS_PER_LOCUS, REPRODUCTION_MODE):
+        self.ploidy = {"sexual": 2, "asexual": 1, "asexual_diploid": 2}[
+            REPRODUCTION_MODE
+        ]
 
         # Number of bits once the chromosomes are collapsed, e.g. if ploidy is 2, there will be N/2 bits per locus after collapsing
         assert (

@@ -1,6 +1,6 @@
 import pathlib
 import time
-import numpy
+import numpy as np
 import shutil
 import argparse
 import logging
@@ -82,21 +82,20 @@ class Panconfiguration:
 
         # Simulation-wide parameters
         self.ECOSYSTEM_NUMBER_ = params["ECOSYSTEM_NUMBER_"]
-        self.STAGE_NUM_ = params["STAGE_NUM_"]
+        self.STAGES_PER_SIMULATION_ = params["STAGES_PER_SIMULATION_"]
         self.LOGGING_RATE_ = params["LOGGING_RATE_"]
         self.PICKLE_RATE_ = params["PICKLE_RATE_"]
         self.SNAPSHOT_RATE_ = params["SNAPSHOT_RATE_"]
         self.VISOR_RATE_ = params["VISOR_RATE_"]
-        self.FLUSH_RATE_ = params["FLUSH_RATE_"]
         self.POPGENSTATS_RATE_ = params["POPGENSTATS_RATE_"]
 
         # Random number generator
         self.random_seed = (
-            numpy.random.randint(1, 10 ** 6)
+            np.random.randint(1, 10 ** 6)
             if params["RANDOM_SEED_"] is None
             else params["RANDOM_SEED_"]
         )
-        self.rng = numpy.random.default_rng(self.random_seed)
+        self.rng = np.random.default_rng(self.random_seed)
 
         # Output directory
         self.output_path = custom_config_path.parent / custom_config_path.stem
@@ -108,7 +107,7 @@ class Panconfiguration:
         self.progress_path = self.output_path / "progress.log"
         content = ("stage", "ETA", "t1M", "runtime", "stg/min")
         with open(self.progress_path, "wb") as f:
-            numpy.savetxt(f, [content], fmt="%-10s", delimiter="| ")
+            np.savetxt(f, [content], fmt="%-10s", delimiter="| ")
 
     def run_stage(self):
         """
@@ -122,12 +121,12 @@ class Panconfiguration:
 
         # Log progress
         def log_progress():
-            logging.info("%8s / %s", self.stage, self.STAGE_NUM_)
+            logging.info("%8s / %s", self.stage, self.STAGES_PER_SIMULATION_)
             eta, sper1M, runtime, stgmin = get_time_estimations()
 
             content = (self.stage, eta, sper1M, runtime, stgmin)
             with open(self.progress_path, "ab") as f:
-                numpy.savetxt(f, [content], fmt="%-10s", delimiter="| ")
+                np.savetxt(f, [content], fmt="%-10s", delimiter="| ")
 
         def get_time_estimations():
             def get_dhm(timediff):
@@ -141,7 +140,7 @@ class Panconfiguration:
             time_diff = time.time() - self.time_start
 
             seconds_per_100 = time_diff / self.stage * 100
-            eta = (self.STAGE_NUM_ - self.stage) / 100 * seconds_per_100
+            eta = (self.STAGES_PER_SIMULATION_ - self.stage) / 100 * seconds_per_100
 
             stages_per_min = int(self.stage / (time_diff / 60))
 
@@ -155,7 +154,7 @@ class Panconfiguration:
             log_progress()
 
         # Return True if the simulation is to be continued
-        return self.stage < self.STAGE_NUM_
+        return self.stage < self.STAGES_PER_SIMULATION_
 
 
 pan = Panconfiguration()  # Initialize now, set up later
