@@ -25,7 +25,7 @@ ECOSYSTEM_NUMBER_: 1
 # ECOLOGY
 MAX_POPULATION_SIZE: 300 # 1+ | Number of individuals in the population
 OVERSHOOT_EVENT: starvation # starvation, cliff, treadmill_random, treadmill_zoomer, treadmill_boomer | Who dies when everyone is starving?
-CLIFF_SURVIVORSHIP: # 0-1 excluding 0 and 1 | What fraction of population survives after a cliff?
+CLIFF_SURVIVORSHIP: # null or 0-1 excluding 0 and 1 | What fraction of population survives after a cliff?; null if not applicable
 STAGES_PER_SEASON: 0 # 0+ | How many stages does one season last; 0 for no seasons
 
 # GENOTYPE
