@@ -15,7 +15,7 @@ venv:
 testnew: generate test
 
 testrun:
-	python3 setup.py
+	python3 setup.py bdist_wheel sdist
 	python3 -m pip install -e .
 	python3 -m aegis tests/run/test_run.yml
 
