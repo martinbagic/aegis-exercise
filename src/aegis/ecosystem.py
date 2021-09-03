@@ -351,7 +351,9 @@ class Ecosystem:
             # self.macroconfig.counter.count(f"age_at_{causeofdeath}", ages_death)
             self.recorder.collect(f"age_at_{causeofdeath}", ages_death)
 
-        ### KEEP THIS FOR REFERENCE ###
+        # =======================
+        # KEEP THIS FOR REFERENCE
+        # =======================
         #
         # Record (some or all) of killed individuals
         # mask_record = (

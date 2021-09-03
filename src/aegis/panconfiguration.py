@@ -3,12 +3,11 @@ import time
 import numpy
 import shutil
 import argparse
+import logging
+import yaml
 
 # TODO migration: add a parameter that determines the magnetism with which a ecosystem attracts other individuals
 
-import logging
-import yaml
-import numpy
 
 from aegis.parameters import validate
 
@@ -75,7 +74,7 @@ class Panconfiguration:
             parsed_args = run_parser()
             custom_config_path = pathlib.Path(parsed_args.custom_config_path).absolute()
 
-        logging.info(f"Custom config path = %s", custom_config_path)
+        logging.info("Custom config path = %s", custom_config_path)
 
         # Get parameters
         params = get_params(custom_config_path)
@@ -123,7 +122,7 @@ class Panconfiguration:
 
         # Log progress
         def log_progress():
-            logging.info(f"%8s / %s", self.stage, self.STAGE_NUM_)
+            logging.info("%8s / %s", self.stage, self.STAGE_NUM_)
             eta, sper1M, runtime, stgmin = get_time_estimations()
 
             content = (self.stage, eta, sper1M, runtime, stgmin)

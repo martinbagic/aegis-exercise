@@ -6,7 +6,6 @@ from aegis.panconfiguration import pan
 class Interpreter:
     """Class for transforming locus bits into gene activities"""
 
-
     def __init__(self, BITS_PER_LOCUS, REPR_MODE):
         self.ploidy = {"sexual": 2, "asexual": 1, "asexual_diploid": 2}[REPR_MODE]
 

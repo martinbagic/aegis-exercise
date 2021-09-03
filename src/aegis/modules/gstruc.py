@@ -1,6 +1,3 @@
-from aegis.panconfiguration import pan
-
-
 class Gstruc:
     """Genome structure"""
 
@@ -43,9 +40,9 @@ class Trait:
             self.lo = get("lo")
             self.hi = get("hi")
 
-            self.length = (
-                params["MAX_LIFESPAN"] if self.agespec else 1
-            )  # Number of loci needed to encode this trait is 1 if the trait is not evolvable and MAX_LIFESPAN if it is evolvable
+            # Number of loci needed to encode this trait is 1 if the trait is not evolvable
+            #   and MAX_LIFESPAN if it is evolvable
+            self.length = params["MAX_LIFESPAN"] if self.agespec else 1
 
         else:
             self.length = 0

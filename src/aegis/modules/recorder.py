@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import pickle
 import json
 import time
 import copy
@@ -64,7 +63,9 @@ class Recorder:
         # PopgenStats
         self.popgenstats = PopgenStats()
 
-    ### RECORDING METHOD 0. (record once) ###
+    # =================================
+    # RECORDING METHOD 0. (record once)
+    # =================================
 
     def record_input_summary(self, input_summary):
         """Records aggregated parameters for a specific ecosystem"""
@@ -80,7 +81,9 @@ class Recorder:
         with open(self.paths["BASE_DIR"] / "output_summary.json", "w") as f:
             json.dump(output_summary, f, indent=4)
 
-    ### RECORDING METHOD I. (snapshots) ###
+    # ===============================
+    # RECORDING METHOD I. (snapshots)
+    # ===============================
 
     def record_pickle(self, obj):
         """Pickle given population"""
@@ -140,7 +143,9 @@ class Recorder:
             array = self.popgenstats.analyze(population)
             np.savetxt(f, [array], delimiter=",", fmt="%1.3e")
 
-    ### RECORDING METHOD II. (flushes) ###
+    # ==============================
+    # RECORDING METHOD II. (flushes)
+    # ==============================
 
     def collect(self, key, ages):
         for age in ages:
