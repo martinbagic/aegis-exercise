@@ -111,6 +111,7 @@ def theta_w(genomes, sample_size=None, sample_provided=False):
         sample_size = genomes.shape[0]
 
     if sample_provided and genomes.shape[0] > 1:
+
         def harmonic(n):
             return np.sum([1 / i for i in np.arange(1, n + 1)])
 
@@ -118,6 +119,7 @@ def theta_w(genomes, sample_size=None, sample_provided=False):
         return s / harmonic(genomes.shape[0] - 1)
 
     if genomes.shape[0] > 1 and sample_size > 1:
+
         def harmonic(n):
             return np.sum([1 / i for i in np.arange(1, n + 1)])
 
@@ -139,7 +141,10 @@ def theta_pi(genomes, sample_size=None, sample_provided=True):
         factor1 = 2 / (genomes.shape[0] * (genomes.shape[0] - 1))
         tmp = genomes.reshape(genomes.shape[0], -1)
         factor2 = np.array(
-            [(tmp[i[0]] != tmp[i[1]]).sum() for i in combinations(range(genomes.shape[0]), 2)]
+            [
+                (tmp[i[0]] != tmp[i[1]]).sum()
+                for i in combinations(range(genomes.shape[0]), 2)
+            ]
         ).sum()
         return (factor1 * factor2) / genomes.shape[0]
 
@@ -160,23 +165,27 @@ def tajimas_d(genomes, sample_size):
     indices = sample(range(genomes.shape[0]), sample_size)
     genomes_sample = genomes[indices, :, :]
 
-    d = theta_pi(genomes_sample, sample_provided=True) - theta_w(genomes_sample, sample_provided=True)
+    d = theta_pi(genomes_sample, sample_provided=True) - theta_w(
+        genomes_sample, sample_provided=True
+    )
     s = segregating_sites(genomes_sample)
 
     def harmonic(n):
         return np.sum([1 / i for i in np.arange(1, n + 1)])
 
     def harmonic_sq(n):
-        return np.sum([1 / (i**2) for i in np.arange(1, n + 1)])
+        return np.sum([1 / (i ** 2) for i in np.arange(1, n + 1)])
 
     a1 = harmonic(sample_size - 1)
     a2 = harmonic_sq(sample_size - 1)
     b1 = (sample_size + 1) / (3 * (sample_size - 1))
-    b2 = (2 * (sample_size**2 + sample_size + 3)) / (9 * sample_size * (sample_size - 1))
+    b2 = (2 * (sample_size ** 2 + sample_size + 3)) / (
+        9 * sample_size * (sample_size - 1)
+    )
     c1 = b1 - (1 / a1)
-    c2 = b2 - ((sample_size + 2) / a1 * sample_size) + (a2 / (a1**2))
+    c2 = b2 - ((sample_size + 2) / a1 * sample_size) + (a2 / (a1 ** 2))
     e1 = c1 / a1
-    e2 = c2 / ((a1**2) + a2)
+    e2 = c2 / ((a1 ** 2) + a2)
     dvar = sqrt((e1 * s) + (e2 * s * (s - 1)))
 
     return d / dvar
