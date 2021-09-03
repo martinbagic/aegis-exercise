@@ -104,10 +104,19 @@ def segregating_sites(genomes):
     return s
 
 
-def theta_w(genomes, sample_size):
+def theta_w(genomes, sample_size=None, sample_provided=False):
     """Returns Watterson's estimator theta_w"""
-    if genomes.shape[0] > 1 and sample_size > 1:
+    if sample_size == None:
+        sample_size = genomes.shape[0]
 
+    if sample_provided and genomes.shape[0] > 1:
+        def harmonic(n):
+            return np.sum([1 / i for i in np.arange(1, n + 1)])
+
+        s = segregating_sites(genomes)
+        return s / harmonic(genomes.shape[0] - 1)
+
+    if genomes.shape[0] > 1 and sample_size > 1:
         def harmonic(n):
             return np.sum([1 / i for i in np.arange(1, n + 1)])
 
