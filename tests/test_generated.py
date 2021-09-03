@@ -35,7 +35,7 @@ def test_scenario(conf):
 
     # compare_text("progress.log")
 
-    compare_csv("0/popgenstats.csv")
+    # compare_csv("0/popgenstats.csv")
 
     compare_csv("0/visor/genotypes.csv")
     compare_csv("0/visor/phenotypes.csv")

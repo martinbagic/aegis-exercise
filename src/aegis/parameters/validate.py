@@ -36,8 +36,8 @@ def validate_values(params):
         "cliff",
         "starvation",
     )
-    assert (
-        isinstance(params["CLIFF_SURVIVORSHIP"], (type(None), float))
+    assert isinstance(params["CLIFF_SURVIVORSHIP"], type(None)) or (
+        isinstance(params["CLIFF_SURVIVORSHIP"], float)
         and 0 < params["CLIFF_SURVIVORSHIP"] < 1
     )
     assert isinstance(params["STAGES_PER_SEASON"], int)
@@ -59,11 +59,14 @@ def validate_values(params):
         "asexual",
         "asexual_diploid",
     )
-    assert isinstance(params["RECOMBINATION_RATE"], (bool, float))
+    assert (
+        isinstance(params["RECOMBINATION_RATE"], (int, float))
+        and params["RECOMBINATION_RATE"] >= 0
+    )
 
     # Mutation
     assert (
-        isinstance(params["MUTATION_RATE"], (int, float))
+        isinstance(params["MUTATION_RATIO"], (int, float))
         and params["MUTATION_RATIO"] >= 0
     )
 
