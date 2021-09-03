@@ -1,5 +1,6 @@
 from statistics import harmonic_mean
 from random import sample
+from itertools import combinations
 import numpy as np
 
 
@@ -97,7 +98,7 @@ def reference_genome(genomes):
 
 def theta_w(genomes, sample_size):
     """Returns Watterson's estimator theta_w"""
-    if genomes.shape[0] > 1:
+    if genomes.shape[0] > 1 and sample_size > 1:
         def harmonic(n):
             return np.sum([1 / i for i in np.arange(1, n + 1)])
 
@@ -106,6 +107,18 @@ def theta_w(genomes, sample_size):
         s = genomes.shape[1] * genomes.shape[2] - ((pre_s == sample_size).sum() + (pre_s == 0).sum())
 
         return s / harmonic(sample_size - 1)
+
+    return np.array([])
+
+
+def theta_pi(genomes, sample_size):
+    """Returns the estimator theta_pi (based on pairwise differences)"""
+    if genomes.shape[0] > 1 and sample_size > 1:
+        factor1 = 2 / (sample_size * (sample_size - 1))
+        indices = sample(range(genomes.shape[0]), sample_size)
+        tmp = genomes.reshape(genomes.shape[0], -1)
+        factor2 = np.array([(tmp[i[0]] != tmp[i[1]]).sum() for i in combinations(indices, 2)]).sum()
+        return (factor1 * factor2) / sample_size
 
     return np.array([])
 
