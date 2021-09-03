@@ -1,6 +1,7 @@
 from statistics import harmonic_mean
 from random import sample
 from itertools import combinations
+from math import sqrt
 import numpy as np
 
 
@@ -152,6 +153,33 @@ def theta_pi(genomes, sample_size=None, sample_provided=True):
         return (factor1 * factor2) / sample_size
 
     return np.array([])
+
+
+def tajimas_d(genomes, sample_size):
+    """Returns Tajima's D"""
+    indices = sample(range(genomes.shape[0]), sample_size)
+    genomes_sample = genomes[indices, :, :]
+
+    d = theta_pi(genomes_sample, sample_provided=True) - theta_w(genomes_sample, sample_provided=True)
+    s = segregating_sites(genomes_sample)
+
+    def harmonic(n):
+        return np.sum([1 / i for i in np.arange(1, n + 1)])
+
+    def harmonic_sq(n):
+        return np.sum([1 / (i**2) for i in np.arange(1, n + 1)])
+
+    a1 = harmonic(sample_size - 1)
+    a2 = harmonic_sq(sample_size - 1)
+    b1 = (sample_size + 1) / (3 * (sample_size - 1))
+    b2 = (2 * (sample_size**2 + sample_size + 3)) / (9 * sample_size * (sample_size - 1))
+    c1 = b1 - (1 / a1)
+    c2 = b2 - ((sample_size + 2) / a1 * sample_size) + (a2 / (a1**2))
+    e1 = c1 / a1
+    e2 = c2 / ((a1**2) + a2)
+    dvar = sqrt((e1 * s) + (e2 * s * (s - 1)))
+
+    return d / dvar
 
 
 # class PopgenStats:
