@@ -96,10 +96,15 @@ class Reproducer:
         # Broadcast to fit [individual, locus, bit] shape
         mutation_probabilities = muta_prob[:, None, None]
 
+        rate_0to1 = self.MUTATION_RATIO / (1 + self.MUTATION_RATIO)
+        rate_1to0 = 1 / (1 + self.MUTATION_RATIO)
+
         mutate_0to1 = (genomes == 0) & (
-            random_probabilities < (mutation_probabilities * self.MUTATION_RATIO)
+            random_probabilities < (mutation_probabilities * rate_0to1)
         )
-        mutate_1to0 = (genomes == 1) & (random_probabilities < mutation_probabilities)
+        mutate_1to0 = (genomes == 1) & (
+            random_probabilities < (mutation_probabilities * rate_1to0)
+        )
 
         mutate = mutate_0to1 + mutate_1to0
 

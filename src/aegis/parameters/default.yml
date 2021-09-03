@@ -68,7 +68,7 @@ REPR_MODE: asexual # sexual, asexual, asexual_diploid | Reproduction mode
 RECOMBINATION_RATE: False # True, False | Rate of recombination
 
 # MUTATION
-MUTATION_RATIO: 0.1 # real 0+ | Ratio of beneficial mutations to detrimental mutations
+MUTATION_RATIO: 0.1 # real 0+ | Ratio of 0->1 mutations to 1->0 mutations
 
 # PHENOMAP
 PHENOMAP_SPECS: [] # | Specification of pleiotropic effects | [[geno index, pheno index, weight], ...]
