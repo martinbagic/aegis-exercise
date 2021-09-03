@@ -83,7 +83,7 @@ class Panconfiguration:
 
         # Simulation-wide parameters
         self.ECOSYSTEM_NUMBER_ = params["ECOSYSTEM_NUMBER_"]
-        self.CYCLE_NUM_ = params["CYCLE_NUM_"]
+        self.STAGE_NUM_ = params["STAGE_NUM_"]
         self.LOGGING_RATE_ = params["LOGGING_RATE_"]
         self.PICKLE_RATE_ = params["PICKLE_RATE_"]
         self.SNAPSHOT_RATE_ = params["SNAPSHOT_RATE_"]
@@ -111,7 +111,7 @@ class Panconfiguration:
         with open(self.progress_path, "wb") as f:
             numpy.savetxt(f, [content], fmt="%-10s", delimiter="| ")
 
-    def cycle(self):
+    def run_stage(self):
         """
         1) Increments stage
         2) Logs progress
@@ -123,7 +123,7 @@ class Panconfiguration:
 
         # Log progress
         def log_progress():
-            logging.info(f"%8s / %s", self.stage, self.CYCLE_NUM_)
+            logging.info(f"%8s / %s", self.stage, self.STAGE_NUM_)
             eta, sper1M, runtime, stgmin = get_time_estimations()
 
             content = (self.stage, eta, sper1M, runtime, stgmin)
@@ -142,7 +142,7 @@ class Panconfiguration:
             time_diff = time.time() - self.time_start
 
             seconds_per_100 = time_diff / self.stage * 100
-            eta = (self.CYCLE_NUM_ - self.stage) / 100 * seconds_per_100
+            eta = (self.STAGE_NUM_ - self.stage) / 100 * seconds_per_100
 
             stages_per_min = int(self.stage / (time_diff / 60))
 
@@ -156,7 +156,7 @@ class Panconfiguration:
             log_progress()
 
         # Return True if the simulation is to be continued
-        return self.stage < self.CYCLE_NUM_
+        return self.stage < self.STAGE_NUM_
 
 
 pan = Panconfiguration()  # Initialize now, set up later

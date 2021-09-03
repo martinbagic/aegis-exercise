@@ -10,7 +10,7 @@ def validate_values(params):
     assert isinstance(params["RANDOM_SEED_"], (int, type(None)))
 
     # Runtime
-    assert isinstance(params["CYCLE_NUM_"], int) and params["CYCLE_NUM_"] > 1
+    assert isinstance(params["STAGE_NUM_"], int) and params["STAGE_NUM_"] > 1
     assert isinstance(params["LOGGING_RATE_"], int) and params["LOGGING_RATE_"] >= 1
 
     # Recording

@@ -13,8 +13,8 @@ This section explains where AEGIS pulls the parameters from. The available param
 
 Parameters can be specified by:
 
-1. **Passing arguments when calling `aegis.run.run`**, e.g. `aegis.run(CYCLE_NUM_=2000, MAX_LIFESPAN=90)`. This is relevant when Aegis is run as an imported module via a script (e.g. in `tests/`). All parameters specified in `legal_types.yml` can be set this way.
-1. **Command line arguments**, in JSON format, e.g. `aegis -e '{"CYCLE_NUM_": 2000, "MAX_LIFESPAN": 90}`. This method is useful if one wants to slightly modify the parameters without having to create a separate config file and calls AEGIS directly from the command line.
+1. **Passing arguments when calling `aegis.run.run`**, e.g. `aegis.run(STAGE_NUM_=2000, MAX_LIFESPAN=90)`. This is relevant when Aegis is run as an imported module via a script (e.g. in `tests/`). All parameters specified in `legal_types.yml` can be set this way.
+1. **Command line arguments**, in JSON format, e.g. `aegis -e '{"STAGE_NUM_": 2000, "MAX_LIFESPAN": 90}`. This method is useful if one wants to slightly modify the parameters without having to create a separate config file and calls AEGIS directly from the command line.
 1. **Config files**, in YML format. The default (`src/aegis/parameters/default.yml`) is always applied, but other config files can be added on top, by specifying them in the command line, e.g. `aegis -c path/to/input_file.yml`. This is useful when many parameters need to be modified, or when the parameterization encodes a distinct scenario which will be reused.
 
 The priority decreases along this list, i.e. the parameters passed as arguments when calling `Aegis` override

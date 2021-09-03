@@ -6,7 +6,7 @@
 RANDOM_SEED_: # int, none | If nothing is given, a random integer will be used as the seed; otherwise the given integer will be used as the seed
 
 # RUNTIME
-CYCLE_NUM_: 1000000 # 1+ | How many stages does the simulation run for?
+STAGE_NUM_: 1000000 # 1+ | How many stages does the simulation run for?
 LOGGING_RATE_: 500 # 1+ | Log every ?-th stage
 
 # RECORDING

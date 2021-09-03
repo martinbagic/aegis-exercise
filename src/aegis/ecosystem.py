@@ -135,8 +135,8 @@ class Ecosystem:
     # MAIN LOGIC #
     ##############
 
-    def cycle(self):
-        """Perform one simulation cycle"""
+    def run_stage(self):
+        """Perform one stage of simulation"""
 
         # If extinct, do nothing
         if self.recorder.extinct:
@@ -190,7 +190,7 @@ class Ecosystem:
     #     self._kill(mask_kill, "end_of_sim")
 
     ###############
-    # CYCLE LOGIC #
+    # STAGE LOGIC #
     ###############
 
     def age(self):

@@ -17,9 +17,9 @@ def main(custom_config_path=None):
     ecosystems = [Ecosystem(i) for i in range(len(pan.params_list))]
 
     # Run simulation
-    while pan.cycle():
+    while pan.run_stage():
         for ecosystem in ecosystems:
-            ecosystem.cycle()
+            ecosystem.run_stage()
 
 
 if __name__ == "__main__":
