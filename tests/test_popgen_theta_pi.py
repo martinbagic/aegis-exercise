@@ -89,6 +89,7 @@ example6 = np.array(
         ((example4, 2), 0.0),
         ((example5, 1), np.array([])),
         ((example6, 1), np.array([])),
+        ((example1, None, True), 1.91667)
     ],
 )
 def test_theta_pi_valid_input(theta_pi_valid_input, expected):

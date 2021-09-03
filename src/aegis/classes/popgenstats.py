@@ -129,8 +129,19 @@ def theta_w(genomes, sample_size=None, sample_provided=False):
     return np.array([])
 
 
-def theta_pi(genomes, sample_size):
+def theta_pi(genomes, sample_size=None, sample_provided=True):
     """Returns the estimator theta_pi (based on pairwise differences)"""
+    if sample_size == None:
+        sample_size = genomes.shape[0]
+
+    if sample_provided and genomes.shape[0] > 1:
+        factor1 = 2 / (genomes.shape[0] * (genomes.shape[0] - 1))
+        tmp = genomes.reshape(genomes.shape[0], -1)
+        factor2 = np.array(
+            [(tmp[i[0]] != tmp[i[1]]).sum() for i in combinations(range(genomes.shape[0]), 2)]
+        ).sum()
+        return (factor1 * factor2) / genomes.shape[0]
+
     if genomes.shape[0] > 1 and sample_size > 1:
         factor1 = 2 / (sample_size * (sample_size - 1))
         indices = sample(range(genomes.shape[0]), sample_size)
