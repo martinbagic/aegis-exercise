@@ -85,12 +85,13 @@ def get_mu(G_muta_initial, G_muta_evolvable, gstruc, phenotypes):
 def get_theta(REPR_MODE, Ne, mu):
     """Returns the adjusted mutation rate theta = 4 * Ne * µ"""
     ploidy_factor = 4 if REPR_MODE != "asexual" else 2
-    theta = (
-        ploidy_factor
-        * Ne
-        * mu
-    )
+    theta = ploidy_factor * Ne * mu
     return theta
+
+
+def reference_genome(genomes):
+    """Calculates the reference genome based on which allele is most common at each position"""
+    return np.round(genomes.reshape(genomes.shape[0], -1).mean(0)).astype("int32")
 
 
 # class PopgenStats:
