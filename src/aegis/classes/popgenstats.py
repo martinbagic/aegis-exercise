@@ -1,4 +1,5 @@
 from statistics import harmonic_mean
+from random import sample
 import numpy as np
 
 
@@ -90,8 +91,23 @@ def get_theta(REPR_MODE, Ne, mu):
 
 
 def reference_genome(genomes):
-    """Calculates the reference genome based on which allele is most common at each position"""
+    """Returns the reference genome based on which allele is most common at each position. Equal fractions -> 0"""
     return np.round(genomes.reshape(genomes.shape[0], -1).mean(0)).astype("int32")
+
+
+def theta_w(genomes, sample_size):
+    """Returns Watterson's estimator theta_w"""
+    if genomes.shape[0] > 1:
+        def harmonic(n):
+            return np.sum([1 / i for i in np.arange(1, n + 1)])
+
+        indices = sample(range(genomes.shape[0]), sample_size)
+        pre_s = genomes.reshape(genomes.shape[0], -1)[indices, :].sum(0)
+        s = genomes.shape[1] * genomes.shape[2] - ((pre_s == sample_size).sum() + (pre_s == 0).sum())
+
+        return s / harmonic(sample_size - 1)
+
+    return np.array([])
 
 
 # class PopgenStats:
