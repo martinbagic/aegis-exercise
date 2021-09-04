@@ -24,8 +24,5 @@ class Environment:
         if self.dummy or pan.skip(self.ENVIRONMENT_CHANGE_RATE):
             return
 
-        chromatid = pan.rng.integers(self.map_.shape[0])
-        locus = pan.rng.integers(self.map_.shape[1])
-        bit = pan.rng.integers(self.map_.shape[2])
-
-        self.map_[chromatid, locus, bit] = ~self.map_[chromatid, locus, bit]
+        indices = tuple(pan.rng.integers(self.map_.shape))
+        self.map_[indices] = ~self.map_[indices]
