@@ -4,12 +4,12 @@ import numpy as np
 class Phenomap:
     """Functional phenomap class"""
 
-    def __init__(self, PHENOMAP_SPECS=None, pos_end=None):
+    def __init__(self, PHENOMAP_SPECS, pos_end):
         """Enable complex translation of genotype into phenotype."""
         # 'Locus value' x 'Contribution to phenotype' matrix
 
         # If no arguments are passed, this class becomes a dummy that does not do anything
-        if PHENOMAP_SPECS is None and pos_end is None:
+        if PHENOMAP_SPECS == []:
             self.dummy = True
         else:
             self.dummy = False

@@ -1,13 +1,10 @@
 import numpy as np
 import logging
 
-from aegis.modules.interpreter import Interpreter
 from aegis.modules.reproducer import Reproducer
 from aegis.modules.overshoot import Overshoot
-from aegis.modules.phenomap import Phenomap
 from aegis.modules.recorder import Recorder
 from aegis.modules.season import Season
-from aegis.modules.environment import Environment
 from aegis.modules.gstruc import Gstruc
 from aegis.modules.population import Population
 
@@ -49,34 +46,11 @@ class Ecosystem:
         # Initialize season
         self.season = Season(STAGES_PER_SEASON=self._get_param("STAGES_PER_SEASON"))
 
-        # Initialize interpreter
-        self.interpreter = Interpreter(self.gstruc)
-
-        # Initialize phenomap
-        self.phenomap = (
-            Phenomap(
-                PHENOMAP_SPECS=self._get_param("PHENOMAP_SPECS"),
-                pos_end=self.gstruc.length,
-            )
-            if self._get_param("PHENOMAP_SPECS") != []
-            else Phenomap()
-        )
-
         # Initialize overshoot
         self.overshoot = Overshoot(
             OVERSHOOT_EVENT=self._get_param("OVERSHOOT_EVENT"),
             MAX_POPULATION_SIZE=self._get_param("MAX_POPULATION_SIZE"),
             CLIFF_SURVIVORSHIP=self._get_param("CLIFF_SURVIVORSHIP"),
-        )
-
-        # Initialize environmental map
-        self.environment = (
-            Environment(
-                gstruc=self.gstruc,
-                ENVIRONMENT_CHANGE_RATE=self._get_param("ENVIRONMENT_CHANGE_RATE"),
-            )
-            if self._get_param("ENVIRONMENT_CHANGE_RATE") > 0
-            else Environment()
         )
 
         # Initialize eggs
@@ -98,7 +72,7 @@ class Ecosystem:
             uids = self._get_n_uids(num)
             births = np.zeros(num, int)
             birthdays = np.zeros(num, int)
-            phenotypes = self._get_phenotype(genomes)
+            phenotypes = self.gstruc.get_phenotype(genomes)
 
             self.population = Population(
                 genomes, ages, origins, uids, births, birthdays, phenotypes
@@ -111,42 +85,27 @@ class Ecosystem:
     def run_stage(self):
         """Perform one stage of simulation"""
 
-        # If extinct, do nothing
-        if self.recorder.extinct:
+        # If extinct (no living individuals nor eggs left), do nothing
+        if len(self) == 0:
+            self.recorder.extinct = True
             return
 
+        self.recorder.record_pickle(self)
         self.recorder.record_snapshots(self.population)
         self.recorder.record_visor(self.population)
         self.recorder.record_popgenstats(self.population)
+        self.recorder.collect("cumulative_ages", self.population.ages)
 
-        if len(self.population):
+        if len(self.population):  # no living individuals
             self.eco_survival()
             self.gen_survival()
             self.reproduction()
             self.age()
 
-        self.recorder.collect("cumulative_ages", self.population.ages)
-
-        self.season.countdown -= 1
-        if self.season.countdown == 0:
-            # Kill all living, hatch eggs, and restart season
-            mask_kill = np.ones(len(self.population), bool)
-            self._kill(mask_kill, "season_shift")
-            self._hatch_eggs()
-            self.season.start_new()
-
-        elif self.season.countdown == float("inf"):
-            # Add newborns to population
-            self._hatch_eggs()
+        self.season_step()
 
         # Evolve environment if applicable
-        self.environment.evolve()
-
-        # Pickle self
-        self.recorder.record_pickle(self)
-
-        if len(self) == 0:
-            self.recorder.extinct = True
+        self.gstruc.environment.evolve()
 
     ###############
     # STAGE LOGIC #
@@ -168,6 +127,19 @@ class Ecosystem:
         probs_surv = self._get_evaluation("surv")
         mask_surv = pan.rng.random(len(probs_surv)) < probs_surv
         self._kill(mask_kill=~mask_surv, causeofdeath="genetic")
+
+    def season_step(self):
+        self.season.countdown -= 1
+        if self.season.countdown == 0:
+            # Kill all living, hatch eggs, and restart season
+            mask_kill = np.ones(len(self.population), bool)
+            self._kill(mask_kill, "season_shift")
+            self._hatch_eggs()
+            self.season.start_new()
+
+        elif self.season.countdown == float("inf"):
+            # Add newborns to population
+            self._hatch_eggs()
 
     def reproduction(self):
         """Let individuals reproduce"""
@@ -220,7 +192,7 @@ class Ecosystem:
             uids=self._get_n_uids(n),
             births=np.zeros(n, int),
             birthdays=np.zeros(n, int) + pan.stage,
-            phenotypes=self._get_phenotype(genomes),
+            phenotypes=self.gstruc.get_phenotype(genomes),
         )
 
         if self.eggs is None:
@@ -242,27 +214,6 @@ class Ecosystem:
         uids = np.arange(n) + self.max_uid
         self.max_uid += n
         return uids
-
-    def _get_phenotype(self, genomes):
-        # Apply the environmental map
-        envgenomes = self.environment(genomes)
-
-        # Apply the interpreter functions
-        interpretome = np.zeros(shape=(envgenomes.shape[0], envgenomes.shape[2]))
-        for trait in self.gstruc.evolvable:
-            loci = envgenomes[:, :, trait.slice]  # fetch
-            probs = self.interpreter(loci, trait.interpreter)  # interpret
-            interpretome[:, trait.slice] += probs  # add back
-
-        # Apply phenomap
-        phenotypes = self.phenomap(interpretome)
-
-        # Apply lo and hi bound
-        for trait in self.gstruc.evolvable:
-            lo, hi = trait.lo, trait.hi
-            phenotypes[:, trait.slice] = phenotypes[:, trait.slice] * (hi - lo) + lo
-
-        return phenotypes
 
     def _get_evaluation(self, attr, part=None):
 

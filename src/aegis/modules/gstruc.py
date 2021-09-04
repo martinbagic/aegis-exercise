@@ -1,4 +1,11 @@
+import numpy as np
+
 from aegis.modules.trait import Trait
+from aegis.modules.interpreter import Interpreter
+from aegis.modules.phenomap import Phenomap
+from aegis.modules.environment import Environment
+
+
 from aegis.panconfiguration import pan
 
 
@@ -32,15 +39,25 @@ class Gstruc:
 
         self.shape = (self.ploidy, self.length, self.bits_per_locus)
 
+        self.phenomap = Phenomap(
+            PHENOMAP_SPECS=params["PHENOMAP_SPECS"],
+            pos_end=self.length,
+        )
+
+        self.interpreter = Interpreter(self)
+
+        self.environment = Environment(
+            gstruc=self,
+            ENVIRONMENT_CHANGE_RATE=params["ENVIRONMENT_CHANGE_RATE"],
+        )
+
     def __getitem__(self, name):
         return self.traits[name]
 
     def initialize_genomes(self, n, headsup=None):
 
         # Initial genomes with a trait.initial fraction of 1's
-        genomes = pan.rng.random(
-            size=(n, *self.shape)
-        )
+        genomes = pan.rng.random(size=(n, *self.shape))
 
         for trait in self.evolvable:
             genomes[:, :, trait.slice] = genomes[:, :, trait.slice] <= trait.initial
@@ -55,3 +72,24 @@ class Gstruc:
             genomes[:, :, repr_start : repr_start + headsup] = True
 
         return genomes
+
+    def get_phenotype(self, genomes):
+        # Apply the environmental map
+        envgenomes = self.environment(genomes)
+
+        # Apply the interpreter functions
+        interpretome = np.zeros(shape=(envgenomes.shape[0], envgenomes.shape[2]))
+        for trait in self.evolvable:
+            loci = envgenomes[:, :, trait.slice]  # fetch
+            probs = self.interpreter(loci, trait.interpreter)  # interpret
+            interpretome[:, trait.slice] += probs  # add back
+
+        # Apply phenomap
+        phenotypes = self.phenomap(interpretome)
+
+        # Apply lo and hi bound
+        for trait in self.evolvable:
+            lo, hi = trait.lo, trait.hi
+            phenotypes[:, trait.slice] = phenotypes[:, trait.slice] * (hi - lo) + lo
+
+        return phenotypes

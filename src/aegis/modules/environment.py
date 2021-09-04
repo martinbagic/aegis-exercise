@@ -6,10 +6,9 @@ from aegis.panconfiguration import pan
 class Environment:
     """Functional environmental map class"""
 
-    def __init__(self, gstruc=None, ENVIRONMENT_CHANGE_RATE=None):
+    def __init__(self, gstruc, ENVIRONMENT_CHANGE_RATE):
 
-        # If no arguments are passed, this class becomes a dummy that does not do anything
-        if ENVIRONMENT_CHANGE_RATE is None:
+        if ENVIRONMENT_CHANGE_RATE == 0:
             self.dummy = True
         else:
             self.dummy = False
