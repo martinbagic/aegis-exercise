@@ -53,3 +53,6 @@ testinstall:
 	. temp/venv/bin/activate
 	python3 -m pip install --upgrade pip
 	python3 -m pip install --index-url https://test.pypi.org/simple --extra-index-url https://pypi.org/simple aging-of-evolving-genomes
+
+profile:
+	python3 profiling/profiler.py

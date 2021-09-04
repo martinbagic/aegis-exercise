@@ -6,6 +6,9 @@ old
 ipynb
 tests/generated/*/
 tests/run
+profiling/*
+!profiling/*.yml
+!profiling/profiler.py
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
