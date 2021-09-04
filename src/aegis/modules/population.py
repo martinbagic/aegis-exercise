@@ -1,5 +1,7 @@
 import numpy as np
 
+from aegis.panconfiguration import pan
+
 
 class Population:
     """Wrapper for all population data"""
@@ -7,18 +9,14 @@ class Population:
     attrs = (
         "genomes",
         "ages",
-        "origins",
-        "uids",
         "births",
         "birthdays",
         "phenotypes",
     )
 
-    def __init__(self, genomes, ages, origins, uids, births, birthdays, phenotypes):
+    def __init__(self, genomes, ages, births, birthdays, phenotypes):
         self.genomes = genomes
         self.ages = ages
-        self.origins = origins
-        self.uids = uids
         self.births = births
         self.birthdays = birthdays
         self.phenotypes = phenotypes
@@ -36,8 +34,6 @@ class Population:
         return Population(
             genomes=self.genomes[index],
             ages=self.ages[index],
-            origins=self.origins[index],
-            uids=self.uids[index],
             births=self.births[index],
             birthdays=self.birthdays[index],
             phenotypes=self.phenotypes[index],

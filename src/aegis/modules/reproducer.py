@@ -4,11 +4,12 @@ from aegis.panconfiguration import pan
 
 
 class Reproducer:
-    def __init__(self, RECOMBINATION_RATE, MUTATION_RATIO):
+    def __init__(self, RECOMBINATION_RATE, MUTATION_RATIO, REPRODUCTION_MODE):
         self.RECOMBINATION_RATE = RECOMBINATION_RATE
         self.MUTATION_RATIO = MUTATION_RATIO
+        self.REPRODUCTION_MODE = REPRODUCTION_MODE
 
-    def recombine(self, genomes):
+    def _recombine(self, genomes):
         """Return recombined genomes"""
 
         if self.RECOMBINATION_RATE == 0:
@@ -47,7 +48,7 @@ class Reproducer:
 
         return recombined
 
-    def assort(self, genomes):
+    def _assort(self, genomes):
         """Return assorted chromatids"""
 
         # Extract parent indices twice, and shuffle
@@ -78,7 +79,7 @@ class Reproducer:
 
         return children, order
 
-    def mutate(self, genomes, muta_prob):
+    def _mutate(self, genomes, muta_prob):
 
         random_probabilities = pan.rng.random(genomes.shape)
 
@@ -98,3 +99,13 @@ class Reproducer:
         mutate = mutate_0to1 + mutate_1to0
 
         return np.logical_xor(genomes, mutate)
+
+    def mate(self, genomes, muta_prob):
+
+        if self.REPRODUCTION_MODE == "sexual":
+            genomes = self._recombine(genomes)
+            genomes, _ = self._assort(genomes)
+
+        genomes = self._mutate(genomes, muta_prob)
+
+        return genomes

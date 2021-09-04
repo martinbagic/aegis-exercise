@@ -41,6 +41,7 @@ class Ecosystem:
         self.reproducer = Reproducer(
             RECOMBINATION_RATE=self._get_param("RECOMBINATION_RATE"),
             MUTATION_RATIO=self._get_param("MUTATION_RATIO"),
+            REPRODUCTION_MODE=self._get_param("REPRODUCTION_MODE"),
         )
 
         # Initialize season
@@ -68,14 +69,12 @@ class Ecosystem:
 
             genomes = self.gstruc.initialize_genomes(num, headsup)
             ages = np.zeros(num, int)
-            origins = np.zeros(num, int) - 1
-            uids = self._get_n_uids(num)
             births = np.zeros(num, int)
             birthdays = np.zeros(num, int)
             phenotypes = self.gstruc.get_phenotype(genomes)
 
             self.population = Population(
-                genomes, ages, origins, uids, births, birthdays, phenotypes
+                genomes, ages, births, birthdays, phenotypes
             )
 
     ##############
@@ -131,9 +130,11 @@ class Ecosystem:
     def season_step(self):
         self.season.countdown -= 1
         if self.season.countdown == 0:
-            # Kill all living, hatch eggs, and restart season
+            # Kill all living
             mask_kill = np.ones(len(self.population), bool)
             self._kill(mask_kill, "season_shift")
+
+            # Hatch eggs and restart season
             self._hatch_eggs()
             self.season.start_new()
 
@@ -162,34 +163,16 @@ class Ecosystem:
         # Increase births statistics
         self.population.births += mask_repr
 
-        # Copy genomes of parents and modify
-        genomes = self.population.genomes[mask_repr]
-        if self._get_param("REPRODUCTION_MODE") == "sexual":
-            genomes = self.reproducer.recombine(genomes)
-            genomes, order = self.reproducer.assort(genomes)
-
-        muta_prob = self._get_evaluation("muta", part=mask_repr)
-        muta_prob = muta_prob[mask_repr]
-        genomes = self.reproducer.mutate(genomes, muta_prob)
-
-        # Get origins
-        if self._get_param("REPRODUCTION_MODE") in ("asexual", "asexual_diploid"):
-            origins = self.population.uids[mask_repr]
-        elif self._get_param("REPRODUCTION_MODE") == "sexual":
-            origins = np.array(
-                [
-                    f"{self.population.uids[order[2*i]]}.{self.population.uids[order[2*i+1]]}"
-                    for i in range(len(order) // 2)
-                ]
-            )
+        # Generate offspring genomes
+        parents = self.population.genomes[mask_repr]
+        muta_prob = self._get_evaluation("muta", part=mask_repr)[mask_repr]
+        genomes = self.reproducer.mate(parents, muta_prob)
 
         # Get eggs
         n = len(genomes)
         eggs = Population(
             genomes=genomes,
             ages=np.zeros(n, int),
-            origins=origins,
-            uids=self._get_n_uids(n),
             births=np.zeros(n, int),
             birthdays=np.zeros(n, int) + pan.stage,
             phenotypes=self.gstruc.get_phenotype(genomes),
@@ -208,12 +191,6 @@ class Ecosystem:
         if self.eggs is not None:
             self.population += self.eggs
             self.eggs = None
-
-    def _get_n_uids(self, n):
-        """Get an array of unique origin identifiers"""
-        uids = np.arange(n) + self.max_uid
-        self.max_uid += n
-        return uids
 
     def _get_evaluation(self, attr, part=None):
 
