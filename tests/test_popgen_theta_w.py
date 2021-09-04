@@ -113,7 +113,8 @@ example6 = np.array(
         ((example4, 2), 0.0),
         ((example5, 1), np.array([])),
         ((example6, 1), np.array([])),
-        ((example1, None, True), 6.55647),
+        ((example1, None, "asexual", True), 6.55647),
+        ((example1, None, "sexual", True), 3.61639),
     ],
 )
 def test_theta_w_valid_input(theta_w_valid_input, expected):

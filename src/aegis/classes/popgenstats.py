@@ -113,29 +113,25 @@ def segregating_sites(genomes, REPR_MODE="asexual"):
     return s
 
 
-def theta_w(genomes, sample_size=None, sample_provided=False):
+def theta_w(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=False):
     """Returns Watterson's estimator theta_w"""
-    if sample_size == None:
+    if sample_size is None:
         sample_size = genomes.shape[0]
 
+    def harmonic(x):
+        return np.sum([1 / i for i in np.arange(1, x + 1)])
+
     if sample_provided and genomes.shape[0] > 1:
-
-        def harmonic(n):
-            return np.sum([1 / i for i in np.arange(1, n + 1)])
-
-        s = segregating_sites(genomes)
-        return s / harmonic(genomes.shape[0] - 1)
+        s = segregating_sites(genomes, REPR_MODE)
+        n = genomes.shape[0] if REPR_MODE == "asexual" else genomes.shape[0] << 1
+        return s / harmonic(n - 1)
 
     if genomes.shape[0] > 1 and sample_size > 1:
-
-        def harmonic(n):
-            return np.sum([1 / i for i in np.arange(1, n + 1)])
-
         indices = sample(range(genomes.shape[0]), sample_size)
         genomes_sample = genomes[indices, :, :]
-        s = segregating_sites(genomes_sample)
-
-        return s / harmonic(sample_size - 1)
+        s = segregating_sites(genomes_sample, REPR_MODE)
+        n = sample_size if REPR_MODE == "asexual" else sample_size << 1
+        return s / harmonic(n - 1)
 
     return np.array([])
 
