@@ -81,53 +81,32 @@ class Ecosystem:
             else Environment()
         )
 
-        # TODO transfer into population.py
+        # Initialize eggs
+        self.eggs = None
+
         # Initialize population
-        def _initialize_genomes():
-            # Make a genome array with random values
-            genomes = pan.rng.random(
-                size=(
-                    self._get_param("MAX_POPULATION_SIZE"),
-                    self.gstruc.length,
-                    self._get_param("BITS_PER_LOCUS"),
-                )
+        if population is not None:
+            self.population = population
+        else:
+            num = self._get_param("MAX_POPULATION_SIZE")
+            HEADSUP = self._get_param("HEADSUP")
+            headsup = (
+                HEADSUP + self._get_param("MATURATION_AGE") if HEADSUP > -1 else None
             )
 
-            # Make a bool map using the initial values from Traits
-            for trait in self.gstruc.evolvable:
-                genomes[:, trait.slice] = genomes[:, trait.slice] <= trait.initial
+            genomes = self.gstruc.initialize_genomes(
+                num, self._get_param("BITS_PER_LOCUS"), headsup
+            )
+            ages = np.zeros(num, int)
+            origins = np.zeros(num, int) - 1
+            uids = self._get_n_uids(num)
+            births = np.zeros(num, int)
+            birthdays = np.zeros(num, int)
+            phenotypes = self._get_phenotype(genomes)
 
-            genomes = genomes.astype(bool)
-
-            # Guarantee survival and reproduction values up to first few mature ages
-            if self._get_param("HEADSUP") > -1:
-                headsup = self._get_param("MATURATION_AGE") + self._get_param("HEADSUP")
-                surv_start = self.gstruc["surv"].start
-                repr_start = self.gstruc["repr"].start
-                genomes[:, surv_start : surv_start + headsup] = True
-                genomes[:, repr_start : repr_start + headsup] = True
-
-            return genomes
-
-        def _get_pop():
-            if population is None:
-                num = self._get_param("MAX_POPULATION_SIZE")
-
-                genomes = _initialize_genomes()
-                ages = np.zeros(num, int)
-                origins = np.zeros(num, int) - 1
-                uids = self._get_n_uids(num)
-                births = np.zeros(num, int)
-                birthdays = np.zeros(num, int)
-                phenotypes = self._get_phenotype(genomes)
-                return Population(
-                    genomes, ages, origins, uids, births, birthdays, phenotypes
-                )
-            else:
-                return population
-
-        self.population = _get_pop()
-        self.eggs = None  # for non-overlapping generations
+            self.population = Population(
+                genomes, ages, origins, uids, births, birthdays, phenotypes
+            )
 
     ##############
     # MAIN LOGIC #
@@ -139,11 +118,6 @@ class Ecosystem:
         # If extinct, do nothing
         if self.recorder.extinct:
             return
-
-        def _hatch_eggs(self):
-            if self.eggs is not None:
-                self.population += self.eggs
-                self.eggs = None
 
         self.recorder.record_snapshots(self.population)
         self.recorder.record_visor(self.population)
@@ -162,12 +136,12 @@ class Ecosystem:
             # Kill all living, hatch eggs, and restart season
             mask_kill = np.ones(len(self.population), bool)
             self._kill(mask_kill, "season_shift")
-            _hatch_eggs(self)
+            self._hatch_eggs()
             self.season.start_new()
 
         elif self.season.countdown == float("inf"):
             # Add newborns to population
-            _hatch_eggs(self)
+            self._hatch_eggs()
 
         # Evolve environment if applicable
         self.environment.evolve()
@@ -177,15 +151,6 @@ class Ecosystem:
 
         if len(self) == 0:
             self.recorder.extinct = True
-
-    # FOR REFERENCE
-    # def terminate(self):
-    #     # Pickle the current population
-    #     self.recorder.record_pickle(self)
-
-    #     # Kill the current population
-    #     mask_kill = np.ones(len(self.population), bool)
-    #     self._kill(mask_kill, "end_of_sim")
 
     ###############
     # STAGE LOGIC #
@@ -271,6 +236,11 @@ class Ecosystem:
     # HELPER FUNCS #
     ################
 
+    def _hatch_eggs(self):
+        if self.eggs is not None:
+            self.population += self.eggs
+            self.eggs = None
+
     def _get_n_uids(self, n):
         """Get an array of unique origin identifiers"""
         uids = np.arange(n) + self.max_uid
@@ -278,35 +248,25 @@ class Ecosystem:
         return uids
 
     def _get_phenotype(self, genomes):
-        def _get_interpretome(omes):
-            """Interpret genomes"""
-            interpretome = np.zeros(shape=omes.shape[:2])
-
-            for trait in self.gstruc.evolvable:
-                # fetch
-                loci = omes[:, trait.slice]
-
-                # interpret
-                probs = self.interpreter(loci, trait.interpreter)
-
-                # add back
-                interpretome[:, trait.slice] += probs
-
-            return interpretome
-
-        def _bound(omes):
-            """Impose lower and upper bounds for genetically encodable attributes."""
-            for trait in self.gstruc.evolvable:
-                lo, hi = trait.lo, trait.hi
-                omes[:, trait.slice] = omes[:, trait.slice] * (hi - lo) + lo
-            return omes
-
+        # Apply the environmental map
         envgenomes = self.environment(genomes)
-        interpretome = _get_interpretome(envgenomes)
-        phenotypes = self.phenomap(interpretome)
-        bounded_phenotypes = _bound(phenotypes)
 
-        return bounded_phenotypes
+        # Apply the interpreter functions
+        interpretome = np.zeros(shape=envgenomes.shape[:2])
+        for trait in self.gstruc.evolvable:
+            loci = envgenomes[:, trait.slice]  # fetch
+            probs = self.interpreter(loci, trait.interpreter)  # interpret
+            interpretome[:, trait.slice] += probs  # add back
+
+        # Apply phenomap
+        phenotypes = self.phenomap(interpretome)
+
+        # Apply lo and hi bound
+        for trait in self.gstruc.evolvable:
+            lo, hi = trait.lo, trait.hi
+            phenotypes[:, trait.slice] = phenotypes[:, trait.slice] * (hi - lo) + lo
+
+        return phenotypes
 
     def _get_evaluation(self, attr, part=None):
 
@@ -348,18 +308,6 @@ class Ecosystem:
             ages_death = self.population.ages[mask_kill]
             # self.macroconfig.counter.count(f"age_at_{causeofdeath}", ages_death)
             self.recorder.collect(f"age_at_{causeofdeath}", ages_death)
-
-        # =======================
-        # KEEP THIS FOR REFERENCE
-        # =======================
-        #
-        # Record (some or all) of killed individuals
-        # mask_record = (
-        #     mask_kill.nonzero()[0][:: self.macroconfig.REC_EVERY_NTH]
-        #     if self.macroconfig.REC_EVERY_NTH > 1
-        #     else mask_kill
-        # )
-        # self.recorder.rec(self.population[mask_record], causeofdeath, self.id_)
 
         # Retain survivors
         self.population *= ~mask_kill

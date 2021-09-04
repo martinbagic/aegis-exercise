@@ -30,10 +30,9 @@ class Overshoot:
 
     def _starvation(self, n):
         """Let starved individuals die"""
-        if n > self.MAX_POPULATION_SIZE:
-            surv_probability = 0.95 ** self.consecutive_overshoot_n
-            random_probabilities = pan.rng.random(n)
-            mask = random_probabilities > surv_probability
+        surv_probability = 0.95 ** self.consecutive_overshoot_n
+        random_probabilities = pan.rng.random(n)
+        mask = random_probabilities > surv_probability
         return mask
 
     def _treadmill_random(self, n):
@@ -46,7 +45,9 @@ class Overshoot:
     def _cliff(self, n):
         """Kill all but random few"""
         indices = pan.rng.choice(
-            n, int(self.MAX_POPULATION_SIZE * self.CLIFF_SURVIVORSHIP), replace=False
+            n,
+            int(self.MAX_POPULATION_SIZE * self.CLIFF_SURVIVORSHIP),
+            replace=False,
         )
         mask = np.ones(n, bool)
         mask[indices] = False
@@ -62,5 +63,4 @@ class Overshoot:
         """Kill the youngest. Let oldest live."""
         mask = np.ones(n, bool)
         mask[: self.MAX_POPULATION_SIZE] = False
-
         return mask

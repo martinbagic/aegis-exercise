@@ -28,10 +28,9 @@ class Environment:
 
     def evolve(self):
         """Modify the environmental map"""
-        if self.dummy:
+        if self.dummy or pan.skip(self.ENVIRONMENT_CHANGE_RATE):
             return
 
-        if not pan.skip(self.ENVIRONMENT_CHANGE_RATE):
-            locus = pan.rng.choice(np.arange(self.map_.shape[0]))
-            bit = pan.rng.choice(np.arange(self.map_.shape[1]))
-            self.map_[locus, bit] = ~self.map_[locus, bit]
+        locus = pan.rng.choice(np.arange(self.map_.shape[0]))
+        bit = pan.rng.choice(np.arange(self.map_.shape[1]))
+        self.map_[locus, bit] = ~self.map_[locus, bit]

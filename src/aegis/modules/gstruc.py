@@ -1,3 +1,7 @@
+from aegis.modules.trait import Trait
+from aegis.panconfiguration import pan
+
+
 class Gstruc:
     """Genome structure"""
 
@@ -20,54 +24,23 @@ class Gstruc:
     def __len__(self):
         return self.length
 
+    def initialize_genomes(self, MAX_POPULATION_SIZE, BITS_PER_LOCUS, headsup=None):
 
-class Trait:
-    """Genetic trait"""
+        # Initial genomes with a trait.initial fraction of 1's
+        genomes = pan.rng.random(
+            size=(MAX_POPULATION_SIZE, self.length, BITS_PER_LOCUS)
+        )
 
-    legal = ("surv", "repr", "neut", "muta")
+        for trait in self.evolvable:
+            genomes[:, trait.slice] = genomes[:, trait.slice] <= trait.initial
 
-    def __init__(self, name, params):
-        def get(key):
-            return params[f"G_{name}_{key}"]
+        genomes = genomes.astype(bool)
 
-        self.evolvable = get("evolvable")
-        self.initial = get("initial")
-        self.name = name
+        # Guarantee survival and reproduction values up to a certain age
+        if headsup is not None:
+            surv_start = self["surv"].start
+            repr_start = self["repr"].start
+            genomes[:, surv_start : surv_start + headsup] = True
+            genomes[:, repr_start : repr_start + headsup] = True
 
-        if self.evolvable:
-            self.agespecific = get("agespecific")
-            self.interpreter = get("interpreter")
-            self.lo = get("lo")
-            self.hi = get("hi")
-
-            # Number of loci needed to encode this trait is 1 if the trait is not evolvable
-            #   and MAX_LIFESPAN if it is evolvable
-            self.length = params["MAX_LIFESPAN"] if self.agespecific else 1
-
-        else:
-            self.length = 0
-
-        self.validate()
-
-    def validate(self):
-        assert isinstance(self.evolvable, bool)
-        assert 0 <= self.initial <= 1
-
-        if self.evolvable:
-            assert isinstance(self.agespecific, bool)
-            assert self.interpreter in (
-                "uniform",
-                "exp",
-                "binary",
-                "binary_exp",
-                "binary_switch",
-                "switch",
-            )
-            assert 0 <= self.lo <= 1
-            assert 0 <= self.hi <= 1
-
-    def __len__(self):
-        return self.length
-
-    def __str__(self):
-        return self.name
+        return genomes

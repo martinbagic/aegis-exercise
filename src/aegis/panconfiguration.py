@@ -19,6 +19,15 @@ logging.basicConfig(
 )
 
 
+def get_dhm(timediff):
+    d = int(timediff / 86400)
+    timediff %= 86400
+    h = int(timediff / 3600)
+    timediff %= 3600
+    m = int(timediff / 60)
+    return f"{d}`{h:02}:{m:02}"
+
+
 class Panconfiguration:
     def skip(self, rate):
         """Should you skip an action performed at a certain rate"""
@@ -109,6 +118,26 @@ class Panconfiguration:
         with open(self.progress_path, "wb") as f:
             np.savetxt(f, [content], fmt="%-10s", delimiter="| ")
 
+    def _log_progress(self):
+        logging.info("%8s / %s", self.stage, self.STAGES_PER_SIMULATION_)
+
+        # Get time estimations
+        time_diff = time.time() - self.time_start
+
+        seconds_per_100 = time_diff / self.stage * 100
+        eta = (self.STAGES_PER_SIMULATION_ - self.stage) / 100 * seconds_per_100
+
+        stages_per_min = int(self.stage / (time_diff / 60))
+
+        runtime = get_dhm(time_diff)
+        time_per_1M = get_dhm(time_diff / self.stage * 1000000)
+        eta = get_dhm(eta)
+
+        # Save time estimations
+        content = (self.stage, eta, time_per_1M, runtime, stages_per_min)
+        with open(self.progress_path, "ab") as f:
+            np.savetxt(f, [content], fmt="%-10s", delimiter="| ")
+
     def run_stage(self):
         """
         1) Increments stage
@@ -120,38 +149,9 @@ class Panconfiguration:
         self.stage += 1
 
         # Log progress
-        def log_progress():
-            logging.info("%8s / %s", self.stage, self.STAGES_PER_SIMULATION_)
-            eta, sper1M, runtime, stgmin = get_time_estimations()
-
-            content = (self.stage, eta, sper1M, runtime, stgmin)
-            with open(self.progress_path, "ab") as f:
-                np.savetxt(f, [content], fmt="%-10s", delimiter="| ")
-
-        def get_time_estimations():
-            def get_dhm(timediff):
-                d = int(timediff / 86400)
-                timediff %= 86400
-                h = int(timediff / 3600)
-                timediff %= 3600
-                m = int(timediff / 60)
-                return f"{d}`{h:02}:{m:02}"
-
-            time_diff = time.time() - self.time_start
-
-            seconds_per_100 = time_diff / self.stage * 100
-            eta = (self.STAGES_PER_SIMULATION_ - self.stage) / 100 * seconds_per_100
-
-            stages_per_min = int(self.stage / (time_diff / 60))
-
-            runtime = get_dhm(time_diff)
-            time_per_1M = get_dhm(time_diff / self.stage * 1000000)
-            eta = get_dhm(eta)
-
-            return eta, time_per_1M, runtime, stages_per_min
 
         if not self.skip(self.LOGGING_RATE_):
-            log_progress()
+            self.log_progress()
 
         # Return True if the simulation is to be continued
         return self.stage < self.STAGES_PER_SIMULATION_

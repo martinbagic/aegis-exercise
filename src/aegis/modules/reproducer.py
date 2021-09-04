@@ -41,6 +41,7 @@ class Reproducer:
         recombined = recombined.reshape(genomes.shape)
 
         # Check one example that bits are recombining
+        # TODO: Consider removing
         if reco_final[0, 0]:
             assert (
                 recombined[0, 0, 0] == chromosomes2[0, 0]
