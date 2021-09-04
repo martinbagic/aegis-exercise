@@ -1,7 +1,5 @@
 import numpy as np
 
-from aegis.panconfiguration import pan
-
 
 class Population:
     """Wrapper for all population data"""
