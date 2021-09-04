@@ -184,10 +184,19 @@ def theta_pi(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fal
     return np.array([])
 
 
-def tajimas_d(genomes, sample_size):
+def tajimas_d(genomes, sample_size, REPR_MODE):
     """Returns Tajima's D"""
-    indices = sample(range(genomes.shape[0]), sample_size)
-    genomes_sample = genomes[indices, :, :]
+    if REPR_MODE == "asexual":
+        indices = sample(range(genomes.shape[0]), sample_size)
+        genomes_sample = genomes[indices, :, :]
+
+    else:
+        indices = sample(range(genomes.shape[0] << 1), sample_size)
+        genomes_sample = (
+            genomes.reshape(-1, 2)
+            .transpose()
+            .reshape(genomes.shape[0] << 1, genomes.shape[1], -1)[indices, :, :]
+        )
 
     d = theta_pi(genomes_sample, sample_provided=True) - theta_w(
         genomes_sample, sample_provided=True
