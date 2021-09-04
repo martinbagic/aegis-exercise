@@ -14,18 +14,22 @@ class Reproducer:
         if self.RECOMBINATION_RATE == 0:
             return genomes
 
+        # TODO note that both recombined ("complementary") gametes are used
+
         # Recombine genomes
-        flat_genomes = genomes.reshape(len(genomes), -1)
-        chromosomes1 = flat_genomes[:, ::2]
-        chromosomes2 = flat_genomes[:, 1::2]
+
+        # TODO be explicit with dimensions, coupling with gstruc
+        flat_genomes = genomes.reshape(len(genomes), 2, -1)
+        chromatid1 = flat_genomes[:, 0]
+        chromatid2 = flat_genomes[:, 1]
 
         # Make choice array: when to take recombined and when to take original loci
         # -1 means synapse; +1 means clear
         rr = (
             self.RECOMBINATION_RATE / 2
         )  # / 2 because you are generating two random vectors (fwd and bkd)
-        reco_fwd = (pan.rng.random(chromosomes1.shape) < rr) * -2 + 1
-        reco_bkd = (pan.rng.random(chromosomes2.shape) < rr) * -2 + 1
+        reco_fwd = (pan.rng.random(chromatid1.shape) < rr) * -2 + 1
+        reco_bkd = (pan.rng.random(chromatid2.shape) < rr) * -2 + 1
 
         # Propagate synapse
         reco_fwd_cum = np.cumprod(reco_fwd, axis=1)
@@ -35,32 +39,16 @@ class Reproducer:
         reco_final = (reco_fwd_cum + reco_bkd_cum) == -2
 
         # Choose bits from first or second chromosome
+        # recombined = np.empty(flat_genomes.shape, bool)
         recombined = np.empty(flat_genomes.shape, bool)
-        recombined[:, ::2] = np.choose(reco_final, [chromosomes1, chromosomes2])
-        recombined[:, 1::2] = np.choose(reco_final, [chromosomes2, chromosomes1])
+        recombined[:, 0] = np.choose(reco_final, [chromatid1, chromatid2])
+        recombined[:, 1] = np.choose(reco_final, [chromatid2, chromatid1])
         recombined = recombined.reshape(genomes.shape)
-
-        # Check one example that bits are recombining
-        # TODO: Consider removing
-        if reco_final[0, 0]:
-            assert (
-                recombined[0, 0, 0] == chromosomes2[0, 0]
-                and recombined[0, 0, 1] == chromosomes1[0, 0]
-            )
-        else:
-            assert (
-                recombined[0, 0, 0] == chromosomes1[0, 0]
-                and recombined[0, 0, 1] == chromosomes2[0, 0]
-            )
 
         return recombined
 
     def assort(self, genomes):
-        """Return assorted chromosomes"""
-        # Locus structure of an example with 8 bits:
-        # [1 2 1 2 1 2 1 2]
-        # [x   x   x   x  ] => 1st chromosome
-        # [  x   x   x   x] => 2nd chromosome
+        """Return assorted chromatids"""
 
         # Extract parent indices twice, and shuffle
         order = np.repeat(np.arange(len(genomes)), 2)
@@ -80,22 +68,22 @@ class Reproducer:
             # If multiple parent index pairs are selfed, shift first chromosomes of selfed pairs
             order[selfed] = order[np.roll(selfed, 1)]
 
-        assorted = genomes[order]
+        # Extract gametes
+        gametes = genomes[order]
 
-        # Children chromosomes are at positions [::2]
-        # Copy second chromosome of second parent onto the second chromosome of the children
-        # Thus, children have the first chromosomes from the first parents and the second chromosomes from the second parents
-        assorted[::2, :, 1::2] = assorted[1::2, :, 1::2]
-        assorted = assorted[::2]
+        # Unify gametes
+        children = np.empty(genomes.shape, bool)
+        children[:, 0] = gametes[::2, 0]  # 1st chromatid from 1st parent
+        children[:, 1] = gametes[1::2, 1]  # 2nd chromatid from 2nd parent
 
-        return assorted, order
+        return children, order
 
     def mutate(self, genomes, muta_prob):
 
         random_probabilities = pan.rng.random(genomes.shape)
 
-        # Broadcast to fit [individual, locus, bit] shape
-        mutation_probabilities = muta_prob[:, None, None]
+        # Broadcast to fit [individual, chromatid, locus, bit] shape
+        mutation_probabilities = muta_prob[:, None, None, None]
 
         rate_0to1 = self.MUTATION_RATIO / (1 + self.MUTATION_RATIO)
         rate_1to0 = 1 / (1 + self.MUTATION_RATIO)

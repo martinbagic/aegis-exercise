@@ -61,8 +61,11 @@ def validate_values(params):
     )
     assert (
         isinstance(params["RECOMBINATION_RATE"], (int, float))
-        and params["RECOMBINATION_RATE"] >= 0
+        and 0 <= params["RECOMBINATION_RATE"] <= 1
     )
+
+    if params["REPRODUCTION_MODE"] in ("asexual", "asexual_diploid"):
+        assert params["RECOMBINATION_RATE"] == 0, "Recombination rate must be 0 if reproduction mode is asexual."
 
     # Mutation
     assert (

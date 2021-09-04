@@ -35,7 +35,9 @@ class Ecosystem:
 
         # Initialize genome structure
         self.gstruc = Gstruc(
-            pan.params_list[self.id_]
+            pan.params_list[self.id_],
+            BITS_PER_LOCUS=self._get_param("BITS_PER_LOCUS"),
+            REPRODUCTION_MODE=self._get_param("REPRODUCTION_MODE"),
         )  # TODO You should not pass all parameters
 
         # Initialize reproducer
@@ -48,10 +50,7 @@ class Ecosystem:
         self.season = Season(STAGES_PER_SEASON=self._get_param("STAGES_PER_SEASON"))
 
         # Initialize interpreter
-        self.interpreter = Interpreter(
-            BITS_PER_LOCUS=self._get_param("BITS_PER_LOCUS"),
-            REPRODUCTION_MODE=self._get_param("REPRODUCTION_MODE"),
-        )
+        self.interpreter = Interpreter(self.gstruc)
 
         # Initialize phenomap
         self.phenomap = (
@@ -73,8 +72,7 @@ class Ecosystem:
         # Initialize environmental map
         self.environment = (
             Environment(
-                BITS_PER_LOCUS=self._get_param("BITS_PER_LOCUS"),
-                total_loci=self.gstruc.length,
+                gstruc=self.gstruc,
                 ENVIRONMENT_CHANGE_RATE=self._get_param("ENVIRONMENT_CHANGE_RATE"),
             )
             if self._get_param("ENVIRONMENT_CHANGE_RATE") > 0
@@ -94,9 +92,7 @@ class Ecosystem:
                 HEADSUP + self._get_param("MATURATION_AGE") if HEADSUP > -1 else None
             )
 
-            genomes = self.gstruc.initialize_genomes(
-                num, self._get_param("BITS_PER_LOCUS"), headsup
-            )
+            genomes = self.gstruc.initialize_genomes(num, headsup)
             ages = np.zeros(num, int)
             origins = np.zeros(num, int) - 1
             uids = self._get_n_uids(num)
@@ -252,9 +248,9 @@ class Ecosystem:
         envgenomes = self.environment(genomes)
 
         # Apply the interpreter functions
-        interpretome = np.zeros(shape=envgenomes.shape[:2])
+        interpretome = np.zeros(shape=(envgenomes.shape[0], envgenomes.shape[2]))
         for trait in self.gstruc.evolvable:
-            loci = envgenomes[:, trait.slice]  # fetch
+            loci = envgenomes[:, :, trait.slice]  # fetch
             probs = self.interpreter(loci, trait.interpreter)  # interpret
             interpretome[:, trait.slice] += probs  # add back
 

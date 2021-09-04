@@ -3,9 +3,12 @@ from aegis.panconfiguration import pan
 
 
 class Gstruc:
-    """Genome structure"""
+    """Genome structure
 
-    def __init__(self, params):
+    genomes.shape == (population size, length, ploidy, bits_per_locus)
+    """
+
+    def __init__(self, params, BITS_PER_LOCUS, REPRODUCTION_MODE):
 
         self.traits = {name: Trait(name, params) for name in Trait.legal}
         self.evolvable = [trait for trait in self.traits.values() if trait.evolvable]
@@ -18,21 +21,29 @@ class Gstruc:
 
             self.length = trait.end
 
+        # Consider ploidy
+        self.ploidy = {
+            "sexual": 2,
+            "asexual": 1,
+            "asexual_diploid": 2,
+        }[REPRODUCTION_MODE]
+
+        self.bits_per_locus = BITS_PER_LOCUS
+
+        self.shape = (self.ploidy, self.length, self.bits_per_locus)
+
     def __getitem__(self, name):
         return self.traits[name]
 
-    def __len__(self):
-        return self.length
-
-    def initialize_genomes(self, MAX_POPULATION_SIZE, BITS_PER_LOCUS, headsup=None):
+    def initialize_genomes(self, n, headsup=None):
 
         # Initial genomes with a trait.initial fraction of 1's
         genomes = pan.rng.random(
-            size=(MAX_POPULATION_SIZE, self.length, BITS_PER_LOCUS)
+            size=(n, *self.shape)
         )
 
         for trait in self.evolvable:
-            genomes[:, trait.slice] = genomes[:, trait.slice] <= trait.initial
+            genomes[:, :, trait.slice] = genomes[:, :, trait.slice] <= trait.initial
 
         genomes = genomes.astype(bool)
 
@@ -40,7 +51,7 @@ class Gstruc:
         if headsup is not None:
             surv_start = self["surv"].start
             repr_start = self["repr"].start
-            genomes[:, surv_start : surv_start + headsup] = True
-            genomes[:, repr_start : repr_start + headsup] = True
+            genomes[:, :, surv_start : surv_start + headsup] = True
+            genomes[:, :, repr_start : repr_start + headsup] = True
 
         return genomes

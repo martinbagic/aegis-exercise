@@ -6,35 +6,26 @@ from aegis.panconfiguration import pan
 class Interpreter:
     """Class for transforming locus bits into gene activities"""
 
-    def __init__(self, BITS_PER_LOCUS, REPRODUCTION_MODE):
-        self.ploidy = {"sexual": 2, "asexual": 1, "asexual_diploid": 2}[
-            REPRODUCTION_MODE
-        ]
-
-        # Number of bits once the chromosomes are collapsed, e.g. if ploidy is 2, there will be N/2 bits per locus after collapsing
-        assert (
-            BITS_PER_LOCUS % self.ploidy == 0
-        ), "BITS_PER_LOCUS must be divisible by ploidy"
-        self.collapsed_bits = BITS_PER_LOCUS // self.ploidy
+    def __init__(self, gstruc):
 
         # Parameters for the binary interpreter
-        self.binary_weights = 2 ** np.arange(self.collapsed_bits)[::-1]
+        self.binary_weights = (
+            2 ** np.arange(gstruc.bits_per_locus)[::-1]
+        )  # TODO coupling with gstruc
         self.binary_max = self.binary_weights.sum()
 
         # Parameters for the binary switch interpreter
+        # Switch bits do not add to locus value
         self.binary_switch_weights = self.binary_weights.copy()
-        self.binary_switch_weights[
-            -self.ploidy :
-        ] = 0  # Switch bits do not add to locus value
+        self.binary_switch_weights[-1] = 0  # Switch bit does not add to locus value
         self.binary_switch_max = self.binary_switch_weights.sum()
 
     def __call__(self, loci, interpreter_kind):
         """The exposed function for calling"""
         interpreter = getattr(self, f"_{interpreter_kind}")
-        # interpreter = self.interpreter_map[interpreter_kind]
 
-        # Take ploidy in consideration by taking an average of n bits from the locus
-        loci = loci.reshape(*loci.shape[:2], self.collapsed_bits, self.ploidy).mean(3)
+        loci = loci.mean(1)
+        # Now, shape of loci is (population_size, gstruc.length, gstruc.bits_per_locus)
 
         interpretome = interpreter(loci)
 
@@ -80,7 +71,7 @@ class Interpreter:
         """
         Locus is evaluated as the sum of bits with exponentially decreasing weights.
         Applicable to muta trait."""
-        return 1 / 2 ** np.sum(~loci, axis=1)
+        return 0.5 ** np.sum(1 - loci, axis=2)
 
     def _binary_exp(self, loci):
         """
