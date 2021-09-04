@@ -17,25 +17,25 @@ from aegis.panconfiguration import pan
 class Ecosystem:
     """Container for one ecosystem"""
 
-    def __init__(self, id, population=None):
+    def __init__(self, id_, population=None):
 
-        self.id = id
+        self.id_ = id_
 
-        logging.info("Initialized ecosystem %s", self.id)
+        logging.info("Initialized ecosystem %s", self.id_)
 
         # Initialize ecosystem variables
         self.max_uid = 0  # ID of the most recently born individual
 
         # Initialize recorder
         self.recorder = Recorder(
-            ecosystem_id=self.id,
+            ecosystem_id=self.id_,
             MAX_LIFESPAN=self._get_param("MAX_LIFESPAN"),
         )
         # self.recorder.record_input_summary(params)  # TODO Record random number generator
 
         # Initialize genome structure
         self.gstruc = Gstruc(
-            pan.params_list[self.id]
+            pan.params_list[self.id_]
         )  # TODO You should not pass all parameters
 
         # Initialize reproducer
@@ -359,7 +359,7 @@ class Ecosystem:
         #     if self.macroconfig.REC_EVERY_NTH > 1
         #     else mask_kill
         # )
-        # self.recorder.rec(self.population[mask_record], causeofdeath, self.id)
+        # self.recorder.rec(self.population[mask_record], causeofdeath, self.id_)
 
         # Retain survivors
         self.population *= ~mask_kill
@@ -374,4 +374,4 @@ class Ecosystem:
 
     def _get_param(self, param):
         """Get parameter value for this specific ecosystem"""
-        return pan.params_list[self.id][param]
+        return pan.params_list[self.id_][param]
