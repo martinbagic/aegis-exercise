@@ -151,7 +151,7 @@ class Panconfiguration:
         # Log progress
 
         if not self.skip(self.LOGGING_RATE_):
-            self.log_progress()
+            self._log_progress()
 
         # Return True if the simulation is to be continued
         return self.stage < self.STAGES_PER_SIMULATION_
