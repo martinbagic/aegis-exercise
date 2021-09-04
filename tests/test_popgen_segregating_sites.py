@@ -107,14 +107,15 @@ example6 = np.array(
 @pytest.mark.parametrize(
     "segregating_sites_valid_input,expected",
     [
-        (example1, 17),
-        (example2, 4),
-        (example3, 3),
-        (example4, 0),
-        (example5, 0),
-        (example6, 0),
+        ((example1, "asexual"), 17),
+        ((example2, "asexual"), 4),
+        ((example3, "asexual"), 3),
+        ((example4, "asexual"), 0),
+        ((example5, "asexual"), 0),
+        ((example6, "asexual"), 0),
+        ((example1, "sexual"), 12),
     ],
 )
 def test_segregating_sites_valid_input(segregating_sites_valid_input, expected):
-    d = popgenstats.segregating_sites(segregating_sites_valid_input)
+    d = popgenstats.segregating_sites(*segregating_sites_valid_input)
     assert pytest.approx(d, 0.0001) == expected

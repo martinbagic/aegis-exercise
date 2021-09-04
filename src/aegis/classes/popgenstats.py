@@ -97,10 +97,18 @@ def reference_genome(genomes):
     return np.round(genomes.reshape(genomes.shape[0], -1).mean(0)).astype("int32")
 
 
-def segregating_sites(genomes):
-    pre_s = genomes.reshape(genomes.shape[0], -1).sum(0)
-    s = genomes.shape[1] * genomes.shape[2] - (
-        (pre_s == genomes.shape[0]).sum() + (pre_s == 0).sum()
+def segregating_sites(genomes, REPR_MODE="asexual"):
+    """Returns the number of segregating sites"""
+    if REPR_MODE == "asexual":
+        pre_s = genomes.reshape(genomes.shape[0], -1).sum(0)
+        s = genomes.shape[1] * genomes.shape[2] - (
+            (pre_s == genomes.shape[0]).sum() + (pre_s == 0).sum()
+        )
+        return s
+
+    pre_s = genomes.reshape(-1, 2).transpose().reshape(genomes.shape[0] << 1, -1).sum(0)
+    s = ((genomes.shape[1] * genomes.shape[2]) >> 1) - (
+        (pre_s == genomes.shape[0] << 1).sum() + (pre_s == 0).sum()
     )
     return s
 
