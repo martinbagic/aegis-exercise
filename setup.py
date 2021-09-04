@@ -1,9 +1,6 @@
 import setuptools
 import pathlib
 
-# TODO add entry points
-
-
 setuptools.setup(
     name="aging-of-evolving-genomes",
     version="2.0.11",

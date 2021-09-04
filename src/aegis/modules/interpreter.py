@@ -9,9 +9,7 @@ class Interpreter:
     def __init__(self, gstruc):
 
         # Parameters for the binary interpreter
-        self.binary_weights = (
-            2 ** np.arange(gstruc.bits_per_locus)[::-1]
-        )  # TODO coupling with gstruc
+        self.binary_weights = 2 ** np.arange(gstruc.bits_per_locus)[::-1]
         self.binary_max = self.binary_weights.sum()
 
         # Parameters for the binary switch interpreter

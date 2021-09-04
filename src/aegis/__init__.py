@@ -3,9 +3,6 @@ This script is executed when this package is imported.
 """
 
 
-# TODO add typing
-
-
 def main(custom_config_path=None):
     from aegis.ecosystem import Ecosystem
     from aegis.panconfiguration import pan

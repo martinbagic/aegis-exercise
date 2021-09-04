@@ -6,8 +6,6 @@ import argparse
 import logging
 import yaml
 
-# TODO migration: add a parameter that determines the magnetism with which a ecosystem attracts other individuals
-
 
 from aegis.parameters import validate
 

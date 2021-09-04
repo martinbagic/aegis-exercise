@@ -64,10 +64,8 @@ specified the stage at which the data was captured, and also the kind of data ca
 
 Visor is the visualization tool complementary to AEGIS.
 
-<!-- TODO Add more -->
-
-
 # Development
+
 ```
 python3 -m pip install -e .[dev]
 ```

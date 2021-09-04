@@ -7,11 +7,6 @@ import copy
 from aegis.panconfiguration import pan
 from aegis.modules.popgenstats import PopgenStats
 
-# TODO maybe don't record phenotypic data, instead transform the genotypic data to phenotypic when necessary
-
-# TODO phylogeny.csv Visor
-# TODO stats.csv Visor
-
 
 class Recorder:
     """
