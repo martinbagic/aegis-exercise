@@ -83,13 +83,15 @@ example6 = np.array(
 @pytest.mark.parametrize(
     "theta_pi_valid_input,expected",
     [
-        ((example1, 4), 1.91667),
-        ((example2, 2), 2.0),
-        ((example3, 2), 1.5),
+        ((example1, 4), 7.66667),
+        ((example2, 2), 4.0),
+        ((example3, 2), 3.0),
         ((example4, 2), 0.0),
         ((example5, 1), np.array([])),
         ((example6, 1), np.array([])),
-        ((example1, None, True), 1.91667),
+        ((example1, None, "asexual", True), 7.66667),
+        ((example1, None, "sexual", True), 5.5),
+        ((example1, 8, "sexual"), 5.5),
     ],
 )
 def test_theta_pi_valid_input(theta_pi_valid_input, expected):

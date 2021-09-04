@@ -1,7 +1,7 @@
 from statistics import harmonic_mean
 from random import sample
 from itertools import combinations
-from math import sqrt
+from math import sqrt, comb
 import numpy as np
 
 
@@ -136,30 +136,50 @@ def theta_w(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fals
     return np.array([])
 
 
-def theta_pi(genomes, sample_size=None, sample_provided=True):
+def theta_pi(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=False):
     """Returns the estimator theta_pi (based on pairwise differences)"""
-    if sample_size == None:
+    if sample_size is None:
         sample_size = genomes.shape[0]
 
     if sample_provided and genomes.shape[0] > 1:
-        factor1 = 2 / (genomes.shape[0] * (genomes.shape[0] - 1))
-        tmp = genomes.reshape(genomes.shape[0], -1)
+        if REPR_MODE == "asexual":
+            factor1 = comb(genomes.shape[0], 2)
+            tmp = genomes.reshape(genomes.shape[0], -1)
+            factor2 = np.array(
+                [
+                    (tmp[i[0]] != tmp[i[1]]).sum()
+                    for i in combinations(range(genomes.shape[0]), 2)
+                ]
+            ).sum()
+            return factor2 / factor1
+
+        factor1 = comb(genomes.shape[0] << 1, 2)
+        tmp = genomes.reshape(-1, 2).transpose().reshape(genomes.shape[0] << 1, -1)
         factor2 = np.array(
             [
                 (tmp[i[0]] != tmp[i[1]]).sum()
-                for i in combinations(range(genomes.shape[0]), 2)
+                for i in combinations(range(genomes.shape[0] << 1), 2)
             ]
         ).sum()
-        return (factor1 * factor2) / genomes.shape[0]
+        return factor2 / factor1
 
     if genomes.shape[0] > 1 and sample_size > 1:
-        factor1 = 2 / (sample_size * (sample_size - 1))
-        indices = sample(range(genomes.shape[0]), sample_size)
-        tmp = genomes.reshape(genomes.shape[0], -1)
+        if REPR_MODE == "asexual":
+            factor1 = comb(sample_size, 2)
+            indices = sample(range(genomes.shape[0]), sample_size)
+            tmp = genomes.reshape(genomes.shape[0], -1)
+            factor2 = np.array(
+                [(tmp[i[0]] != tmp[i[1]]).sum() for i in combinations(indices, 2)]
+            ).sum()
+            return factor2 / factor1
+
+        factor1 = comb(sample_size, 2)
+        indices = sample(range(genomes.shape[0] << 1), sample_size)
+        tmp = genomes.reshape(-1, 2).transpose().reshape(genomes.shape[0] << 1, -1)
         factor2 = np.array(
             [(tmp[i[0]] != tmp[i[1]]).sum() for i in combinations(indices, 2)]
         ).sum()
-        return (factor1 * factor2) / sample_size
+        return factor2 / factor1
 
     return np.array([])
 
