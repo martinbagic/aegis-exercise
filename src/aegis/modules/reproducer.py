@@ -15,12 +15,15 @@ class Reproducer:
         if self.RECOMBINATION_RATE == 0:
             return genomes
 
-        # TODO note that both recombined ("complementary") gametes are used
+        # Recombine two chromatids but pass only one;
+        #   thus double the number of chromatids, recobine,
+        #   then return only one chromatid from each chromatid pair
+        genomes = genomes[np.repeat(np.arange(len(genomes)), 2)]
 
-        # Recombine genomes
-
-        # TODO be explicit with dimensions, coupling with gstruc
+        # Flatten loci and bits
         flat_genomes = genomes.reshape(len(genomes), 2, -1)
+
+        # Get chromatids
         chromatid1 = flat_genomes[:, 0]
         chromatid2 = flat_genomes[:, 1]
 
@@ -39,14 +42,14 @@ class Reproducer:
         # Recombine if both sites recombining
         reco_final = (reco_fwd_cum + reco_bkd_cum) == -2
 
-        # Choose bits from first or second chromosome
+        # Choose bits from first or second chromatid
         # recombined = np.empty(flat_genomes.shape, bool)
         recombined = np.empty(flat_genomes.shape, bool)
         recombined[:, 0] = np.choose(reco_final, [chromatid1, chromatid2])
         recombined[:, 1] = np.choose(reco_final, [chromatid2, chromatid1])
         recombined = recombined.reshape(genomes.shape)
 
-        return recombined
+        return recombined[::2]  # Look at first comment in the function
 
     def _assort(self, genomes):
         """Return assorted chromatids"""
@@ -59,14 +62,14 @@ class Reproducer:
         selfed = (order[::2] == order[1::2]).nonzero()[0] * 2
 
         if len(selfed) == 1:
-            # If one parent index pair is selfed, swap first selfed chromosome with the first chromosome of the previous or next pair
+            # If one parent index pair is selfed, swap first selfed chromatid with the first chromatid of the previous or next pair
             offset = -2 if selfed[0] > 0 else 2
             order[selfed], order[selfed + offset] = (
                 order[selfed + offset],
                 order[selfed],
             )
         elif len(selfed) > 1:
-            # If multiple parent index pairs are selfed, shift first chromosomes of selfed pairs
+            # If multiple parent index pairs are selfed, shift first chromatid of selfed pairs
             order[selfed] = order[np.roll(selfed, 1)]
 
         # Extract gametes
