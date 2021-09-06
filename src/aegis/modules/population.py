@@ -19,13 +19,18 @@ class Population:
         self.birthdays = birthdays
         self.phenotypes = phenotypes
 
+        if not (
+            len(genomes)
+            == len(ages)
+            == len(births)
+            == len(birthdays)
+            == len(phenotypes)
+        ):
+            raise ValueError("Population attributes must have equal length")
+
     def __len__(self):
         """Return the number of living individuals"""
-        n = len(self.genomes)
-        assert all(len(getattr(self, attr)) == n for attr in self.attrs), " ".join(
-            (str(len(getattr(self, attr))) for attr in self.attrs)
-        )
-        return n
+        return len(self.genomes)
 
     def __getitem__(self, index):
         """Return a subpopulation"""
