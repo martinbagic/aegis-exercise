@@ -149,50 +149,33 @@ def theta_w(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fals
 
 def theta_pi(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=False):
     """Returns the estimator theta_pi (based on pairwise differences)"""
+    if REPR_MODE != "asexual":
+        genomes = (
+            genomes.reshape(-1, 2)
+            .transpose()
+            .reshape(genomes.shape[0] << 1, genomes.shape[1], -1)
+        )
+
     if sample_size is None:
         sample_size = genomes.shape[0]
 
-    if sample_provided and genomes.shape[0] > 1:
-        if REPR_MODE == "asexual":
-            factor1 = comb(genomes.shape[0], 2)
-            tmp = genomes.reshape(genomes.shape[0], -1)
-            factor2 = np.array(
-                [
-                    (tmp[i[0]] != tmp[i[1]]).sum()
-                    for i in combinations(range(genomes.shape[0]), 2)
-                ]
-            ).sum()
-            return factor2 / factor1
+    if sample_size < 2 or genomes.shape[0] < 2:
+        return np.array([])
 
-        factor1 = comb(genomes.shape[0] << 1, 2)
-        tmp = genomes.reshape(-1, 2).transpose().reshape(genomes.shape[0] << 1, -1)
-        factor2 = np.array(
-            [
-                (tmp[i[0]] != tmp[i[1]]).sum()
-                for i in combinations(range(genomes.shape[0] << 1), 2)
-            ]
-        ).sum()
-        return factor2 / factor1
+    if sample_provided:
+        genomes_sample = genomes
 
-    if genomes.shape[0] > 1 and sample_size > 1:
-        if REPR_MODE == "asexual":
-            factor1 = comb(sample_size, 2)
-            indices = sample(range(genomes.shape[0]), sample_size)
-            tmp = genomes.reshape(genomes.shape[0], -1)
-            factor2 = np.array(
-                [(tmp[i[0]] != tmp[i[1]]).sum() for i in combinations(indices, 2)]
-            ).sum()
-            return factor2 / factor1
+    else:
+        indices = sample(range(genomes.shape[0]), sample_size)
+        genomes_sample = genomes[indices, :, :]
 
-        factor1 = comb(sample_size, 2)
-        indices = sample(range(genomes.shape[0] << 1), sample_size)
-        tmp = genomes.reshape(-1, 2).transpose().reshape(genomes.shape[0] << 1, -1)
-        factor2 = np.array(
-            [(tmp[i[0]] != tmp[i[1]]).sum() for i in combinations(indices, 2)]
-        ).sum()
-        return factor2 / factor1
+    combs = combinations(range(sample_size), 2)
+    tmp = genomes_sample.reshape(sample_size, -1)
+    diffs = np.array([(tmp[i[0]] != tmp[i[1]]).sum() for i in combs])
+    total_diffs = diffs.sum()
+    ncomparisons = diffs.size
 
-    return np.array([])
+    return total_diffs / ncomparisons
 
 
 def tajimas_d(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=False):
