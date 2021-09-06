@@ -184,23 +184,26 @@ def theta_pi(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fal
     return np.array([])
 
 
-def tajimas_d(genomes, sample_size, REPR_MODE):
+def tajimas_d(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=False):
     """Returns Tajima's D"""
-    if REPR_MODE == "asexual":
+    if REPR_MODE != "asexual":
+        genomes = (
+            genomes.reshape(-1, 2)
+            .transpose()
+            .reshape(genomes.shape[0] << 1, genomes.shape[1], -1)
+        )
+
+    if sample_size is None:
+        sample_size = genomes.shape[0]
+
+    if sample_provided:
+        genomes_sample = genomes
+
+    else:
         indices = sample(range(genomes.shape[0]), sample_size)
         genomes_sample = genomes[indices, :, :]
 
-    else:
-        indices = sample(range(genomes.shape[0] << 1), sample_size)
-        genomes_sample = (
-            genomes.reshape(-1, 2)
-            .transpose()
-            .reshape(genomes.shape[0] << 1, genomes.shape[1], -1)[indices, :, :]
-        )
-
-    d = theta_pi(genomes_sample, sample_provided=True) - theta_w(
-        genomes_sample, sample_provided=True
-    )
+    d = theta_pi(genomes_sample) - theta_w(genomes_sample)
     s = segregating_sites(genomes_sample)
 
     def harmonic(n):
