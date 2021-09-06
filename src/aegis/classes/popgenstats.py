@@ -190,6 +190,9 @@ def tajimas_d(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fa
     if sample_size is None:
         sample_size = genomes.shape[0]
 
+    if sample_size < 3 or genomes.shape[0] < 3:
+        return np.array([])
+
     if sample_provided:
         genomes_sample = genomes
 
@@ -199,12 +202,6 @@ def tajimas_d(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fa
 
     d = theta_pi(genomes_sample) - theta_w(genomes_sample)
     s = segregating_sites(genomes_sample)
-
-    def harmonic(n):
-        return np.sum([1 / i for i in np.arange(1, n + 1)])
-
-    def harmonic_sq(n):
-        return np.sum([1 / (i ** 2) for i in np.arange(1, n + 1)])
 
     a1 = harmonic(sample_size - 1)
     a2 = harmonic_sq(sample_size - 1)
