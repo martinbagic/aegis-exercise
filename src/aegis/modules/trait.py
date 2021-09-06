@@ -7,21 +7,21 @@ class Trait:
         def get(key):
             return params[f"G_{name}_{key}"]
 
-        self.evolvable = get("evolvable")
-        self.initial = get("initial")
         self.name = name
+        self.evolvable = get("evolvable")
+        self.agespecific = get("agespecific")
+        self.interpreter = get("interpreter")
+        self.lo = get("lo")
+        self.hi = get("hi")
+        self.initial = get("initial")
 
+        # Determine the number of loci encoding the trait
         if self.evolvable:
-            self.agespecific = get("agespecific")
-            self.interpreter = get("interpreter")
-            self.lo = get("lo")
-            self.hi = get("hi")
-
-            # Number of loci needed to encode this trait is 1 if the trait is not evolvable
-            #   and MAX_LIFESPAN if it is evolvable
-            self.length = params["MAX_LIFESPAN"] if self.agespecific else 1
-
-        else:
+            if self.agespecific:  # one locus per age
+                self.length = params["MAX_LIFESPAN"]
+            else:  # one locus for all ages
+                self.length = 1
+        else:  # no loci for a constant trait
             self.length = 0
 
         self.validate()
