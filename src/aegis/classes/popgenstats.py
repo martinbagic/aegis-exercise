@@ -213,7 +213,7 @@ def tajimas_d(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fa
         9 * sample_size * (sample_size - 1)
     )
     c1 = b1 - (1 / a1)
-    c2 = b2 - ((sample_size + 2) / a1 * sample_size) + (a2 / (a1 ** 2))
+    c2 = b2 - ((sample_size + 2) / (a1 * sample_size)) + (a2 / (a1 ** 2))
     e1 = c1 / a1
     e2 = c2 / ((a1 ** 2) + a2)
     dvar = sqrt((e1 * s) + (e2 * s * (s - 1)))
