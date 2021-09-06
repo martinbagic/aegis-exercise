@@ -24,9 +24,9 @@ class Trait:
         else:  # no loci for a constant trait
             self.length = 0
 
-        self.validate()
+        self._validate()
 
-    def validate(self):
+    def _validate(self):
         assert isinstance(self.evolvable, bool)
         assert 0 <= self.initial <= 1
 
