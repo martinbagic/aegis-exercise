@@ -24,7 +24,6 @@ generate:
 	python3 tests/generate.py
 
 test:
-	python3 -m pip install pytest
 	pytest tests/ --log-cli-level=DEBUG
 
 manifest:
