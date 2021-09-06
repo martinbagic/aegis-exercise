@@ -66,10 +66,10 @@ G_neut_hi:
 G_neut_initial: 1
 
 G_muta_evolvable: false
-G_neut_agespecific:
-G_neut_interpreter:
-G_neut_lo:
-G_neut_hi:
+G_muta_agespecific:
+G_muta_interpreter:
+G_muta_lo:
+G_muta_hi:
 G_muta_initial: 0.001
 
 # REPRODUCTION
