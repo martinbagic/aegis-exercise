@@ -34,21 +34,31 @@ class Trait:
         self.slice = slice(self.start, self.end)
 
     def _validate(self):
-        assert isinstance(self.evolvable, bool)
-        assert 0 <= self.initial <= 1
+        if not isinstance(self.evolvable, bool):
+            raise TypeError
+
+        if not 0 <= self.initial <= 1:
+            raise ValueError
 
         if self.evolvable:
-            assert isinstance(self.agespecific, bool)
-            assert self.interpreter in (
+            if not isinstance(self.agespecific, bool):
+                raise TypeError
+
+            if self.interpreter not in (
                 "uniform",
                 "exp",
                 "binary",
                 "binary_exp",
                 "binary_switch",
                 "switch",
-            )
-            assert 0 <= self.lo <= 1
-            assert 0 <= self.hi <= 1
+            ):
+                raise ValueError
+
+            if not 0 <= self.lo <= 1:
+                raise ValueError
+
+            if not 0 <= self.hi <= 1:
+                raise ValueError
 
     def __len__(self):
         return self.length

@@ -16,12 +16,6 @@ def test_scenario(conf):
     path_generated = base_path / "generated" / conf
     path_reference = base_path / "reference" / conf
 
-    # def compare_text(subpath):
-    #     with open(path_generated / subpath, "r") as f:
-    #         text_generated = f.read()
-    #     with open(path_reference / subpath, "r") as f:
-    #         text_reference = f.read()
-    #     assert text_reference == text_generated
 
     def compare_csv(subpath):
         df_generated = pd.read_csv(path_generated / subpath)
