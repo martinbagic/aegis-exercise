@@ -6,6 +6,9 @@ from aegis.panconfiguration import pan
 class Interpreter:
     """Class for transforming locus bits into gene activities"""
 
+    exp_base = 0.5
+    binary_exp_base = 0.98
+
     def __init__(self, BITS_PER_LOCUS):
 
         # Parameters for the binary interpreter
@@ -73,7 +76,7 @@ class Interpreter:
         """
         Locus is evaluated as the sum of bits with exponentially decreasing weights.
         Applicable to muta trait."""
-        return 0.5 ** np.sum(1 - loci, axis=2)
+        return self.exp_base ** np.sum(1 - loci, axis=2)
 
     def _binary_exp(self, loci):
         """
@@ -81,4 +84,4 @@ class Interpreter:
         Applicable to muta trait.
         """
         binary = self._binary(loci)
-        return 0.98 ** binary
+        return self.binary_exp_base ** binary
