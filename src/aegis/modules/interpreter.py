@@ -22,12 +22,16 @@ class Interpreter:
         """The exposed function for calling"""
         interpreter = getattr(self, f"_{interpreter_kind}")
 
-        loci = loci.mean(1)
+        loci = self._diploid_to_haploid(loci)
         # Now, shape of loci is (population_size, gstruc.length, bits_per_locus)
 
         interpretome = interpreter(loci)
 
         return interpretome
+
+    def _diploid_to_haploid(self, loci):
+        # Now implied semidominance, but other inheritance modes are possible
+        return loci.mean(1)
 
     def _binary(self, loci):
         """
