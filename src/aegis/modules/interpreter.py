@@ -6,10 +6,10 @@ from aegis.panconfiguration import pan
 class Interpreter:
     """Class for transforming locus bits into gene activities"""
 
-    def __init__(self, gstruc):
+    def __init__(self, BITS_PER_LOCUS):
 
         # Parameters for the binary interpreter
-        self.binary_weights = 2 ** np.arange(gstruc.bits_per_locus)[::-1]
+        self.binary_weights = 2 ** np.arange(BITS_PER_LOCUS)[::-1]
         self.binary_max = self.binary_weights.sum()
 
         # Parameters for the binary switch interpreter
@@ -23,7 +23,7 @@ class Interpreter:
         interpreter = getattr(self, f"_{interpreter_kind}")
 
         loci = loci.mean(1)
-        # Now, shape of loci is (population_size, gstruc.length, gstruc.bits_per_locus)
+        # Now, shape of loci is (population_size, gstruc.length, bits_per_locus)
 
         interpretome = interpreter(loci)
 

@@ -17,18 +17,19 @@ class Gstruc:
 
     def __init__(self, params, BITS_PER_LOCUS, REPRODUCTION_MODE):
 
-        self.traits = {name: Trait(name, params) for name in Trait.legal}
-        self.evolvable = [trait for trait in self.traits.values() if trait.evolvable]
+        # Generate traits and save
+        self.traits = {}
+        self.evolvable = []
         self.length = 0
 
-        for trait in self.traits.values():
-            trait.start = self.length
-            trait.end = self.length + trait.length
-            trait.slice = slice(trait.start, trait.end)
+        for name in Trait.legal:
+            trait = Trait(name, params, self.length)
+            self.traits[name] = trait
+            self.length += trait.length
+            if trait.evolvable:
+                self.evolvable.append(trait)
 
-            self.length = trait.end
-
-        # Consider ploidy
+        # Infer ploidy
         self.ploidy = {
             "sexual": 2,
             "asexual": 1,
@@ -44,10 +45,10 @@ class Gstruc:
             pos_end=self.length,
         )
 
-        self.interpreter = Interpreter(self)
+        self.interpreter = Interpreter(BITS_PER_LOCUS)
 
         self.environment = Environment(
-            gstruc=self,
+            gstruc_shape=self.shape,
             ENVIRONMENT_CHANGE_RATE=params["ENVIRONMENT_CHANGE_RATE"],
         )
 

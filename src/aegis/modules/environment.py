@@ -6,13 +6,13 @@ from aegis.panconfiguration import pan
 class Environment:
     """Functional environmental map class"""
 
-    def __init__(self, gstruc, ENVIRONMENT_CHANGE_RATE):
+    def __init__(self, gstruc_shape, ENVIRONMENT_CHANGE_RATE):
 
         if ENVIRONMENT_CHANGE_RATE == 0:
             self.dummy = True
         else:
             self.dummy = False
-            self.map_ = np.zeros(gstruc.shape, bool)
+            self.map_ = np.zeros(gstruc_shape, bool)
             self.ENVIRONMENT_CHANGE_RATE = ENVIRONMENT_CHANGE_RATE
 
     def __call__(self, genomes):

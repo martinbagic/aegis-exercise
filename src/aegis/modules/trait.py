@@ -3,11 +3,13 @@ class Trait:
 
     legal = ("surv", "repr", "neut", "muta")
 
-    def __init__(self, name, params):
+    def __init__(self, name, params, start):
         def get(key):
             return params[f"G_{name}_{key}"]
 
         self.name = name
+
+        # Attributes set by the configuration files
         self.evolvable = get("evolvable")
         self.agespecific = get("agespecific")
         self.interpreter = get("interpreter")
@@ -25,6 +27,11 @@ class Trait:
             self.length = 0
 
         self._validate()
+
+        # Set positions in the genome
+        self.start = start
+        self.end = self.start + self.length
+        self.slice = slice(self.start, self.end)
 
     def _validate(self):
         assert isinstance(self.evolvable, bool)
