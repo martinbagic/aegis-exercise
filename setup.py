@@ -3,7 +3,7 @@ import pathlib
 
 setuptools.setup(
     name="aegis-sim",
-    version="2.0.0",
+    version="2.0.1",
     description="",
     long_description=(pathlib.Path(__file__).parent / "README.md").read_text(),
     long_description_content_type="text/markdown",
@@ -18,7 +18,6 @@ setuptools.setup(
     ],
     package_data={
         "aegis": ["parameters/default.yml"],
-        "": ["tests/*.py"],
     },
     python_requires=">=3.6",
     entry_points={
