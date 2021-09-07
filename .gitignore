@@ -156,5 +156,10 @@ Thumbs.db
 # profiling data
 .prof
 
+# R files
+*.R
+
+# PDF files
+*.pdf
 
 # End of https://www.toptal.com/developers/gitignore/api/python
