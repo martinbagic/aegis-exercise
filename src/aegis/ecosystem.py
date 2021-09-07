@@ -12,11 +12,14 @@ from aegis.panconfiguration import pan
 
 
 class Ecosystem:
-    """Container for one ecosystem"""
+    """Ecosystem
+
+    Contains all logic and data necessary to simulate one population.
+    """
 
     def __init__(self, id_, population=None):
 
-        self.id_ = id_
+        self.id_ = id_  # Important when there are multiple populations
 
         logging.info("Initialized ecosystem %s", self.id_)
 
@@ -28,7 +31,6 @@ class Ecosystem:
             ecosystem_id=self.id_,
             MAX_LIFESPAN=self._get_param("MAX_LIFESPAN"),
         )
-        # self.recorder.record_input_summary(params)  # TODO Record random number generator
 
         # Initialize genome structure
         self.gstruc = Gstruc(
@@ -73,16 +75,14 @@ class Ecosystem:
             birthdays = np.zeros(num, int)
             phenotypes = self.gstruc.get_phenotype(genomes)
 
-            self.population = Population(
-                genomes, ages, births, birthdays, phenotypes
-            )
+            self.population = Population(genomes, ages, births, birthdays, phenotypes)
 
     ##############
     # MAIN LOGIC #
     ##############
 
     def run_stage(self):
-        """Perform one stage of simulation"""
+        """Perform one stage of simulation."""
 
         # If extinct (no living individuals nor eggs left), do nothing
         if len(self) == 0:
@@ -111,23 +111,25 @@ class Ecosystem:
     ###############
 
     def age(self):
-        """Increase age of all by one and kill those that surpass max lifespan"""
+        """Increase age of all by one and kill those that surpass max lifespan."""
         self.population.ages += 1
         mask_kill = self.population.ages >= self._get_param("MAX_LIFESPAN")
         self._kill(mask_kill=mask_kill, causeofdeath="max_lifespan")
 
     def eco_survival(self):
-        """Impose ecological death, i.e. death that arises due to resource scarcity"""
+        """Impose ecological death, i.e. death that arises due to resource scarcity."""
         mask_kill = self.overshoot(n=len(self.population))
         self._kill(mask_kill=mask_kill, causeofdeath="overshoot")
 
     def gen_survival(self):
-        """Impose genomic death, i.e. death that arises with probability encoded in the genome"""
+        """Impose genomic death, i.e. death that arises with probability encoded in the genome."""
         probs_surv = self._get_evaluation("surv")
         mask_surv = pan.rng.random(len(probs_surv)) < probs_surv
         self._kill(mask_kill=~mask_surv, causeofdeath="genetic")
 
     def season_step(self):
+        """Let one time unit pass in the season.
+        Kill the population if the season is over, and hatch the saved eggs."""
         self.season.countdown -= 1
         if self.season.countdown == 0:
             # Kill all living
@@ -143,7 +145,7 @@ class Ecosystem:
             self._hatch_eggs()
 
     def reproduction(self):
-        """Let individuals reproduce"""
+        """Generate offspring of reproducing individuals."""
 
         # Check if mature
         mask_mature = self.population.ages >= self._get_param("MATURATION_AGE")
@@ -166,7 +168,7 @@ class Ecosystem:
         # Generate offspring genomes
         parents = self.population.genomes[mask_repr]
         muta_prob = self._get_evaluation("muta", part=mask_repr)[mask_repr]
-        genomes = self.reproducer.mate(parents, muta_prob)
+        genomes = self.reproducer(parents, muta_prob)
 
         # Get eggs
         n = len(genomes)
@@ -188,12 +190,13 @@ class Ecosystem:
     ################
 
     def _hatch_eggs(self):
+        """Add offspring from eggs into the living population."""
         if self.eggs is not None:
             self.population += self.eggs
             self.eggs = None
 
     def _get_evaluation(self, attr, part=None):
-
+        """Get phenotypic values of a certain trait for a certain individuals."""
         which_individuals = np.arange(len(self.population))
         if part is not None:
             which_individuals = which_individuals[part]
@@ -218,8 +221,7 @@ class Ecosystem:
         return final_probs
 
     def _kill(self, mask_kill, causeofdeath):
-        """
-        Kill individuals and record their data.
+        """Kill individuals and record their data.
         Killing can occur due to age, genomic death, ecological death, and season shift.
         """
 
@@ -237,7 +239,7 @@ class Ecosystem:
         self.population *= ~mask_kill
 
     def __len__(self):
-        """Return the number of living individuals and saved eggs"""
+        """Return the number of living individuals and saved eggs."""
         return (
             len(self.population) + len(self.eggs)
             if self.eggs is not None
@@ -245,5 +247,5 @@ class Ecosystem:
         )
 
     def _get_param(self, param):
-        """Get parameter value for this specific ecosystem"""
+        """Get parameter value for this specific ecosystem."""
         return pan.params_list[self.id_][param]

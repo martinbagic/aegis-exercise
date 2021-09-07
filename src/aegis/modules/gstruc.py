@@ -1,18 +1,17 @@
-import numpy as np
 
+import numpy as np
 from aegis.modules.trait import Trait
 from aegis.modules.interpreter import Interpreter
 from aegis.modules.phenomap import Phenomap
 from aegis.modules.environment import Environment
-
-
 from aegis.panconfiguration import pan
 
 
 class Gstruc:
     """Genome structure
 
-    genomes.shape == (population size, length, ploidy, bits_per_locus)
+    Contains information about ploidy, number of loci, and number of bits per locus.
+    Calculates phenotypes from input genomes (calls Interpreter, Phenomap and Environment).
     """
 
     def __init__(self, params, BITS_PER_LOCUS, REPRODUCTION_MODE):
@@ -42,7 +41,7 @@ class Gstruc:
 
         self.phenomap = Phenomap(
             PHENOMAP_SPECS=params["PHENOMAP_SPECS"],
-            pos_end=self.length,
+            gstruc_length=self.length,
         )
 
         self.interpreter = Interpreter(BITS_PER_LOCUS)
@@ -53,9 +52,15 @@ class Gstruc:
         )
 
     def __getitem__(self, name):
+        """Return a Trait instance called {name}."""
         return self.traits[name]
 
     def initialize_genomes(self, n, headsup=None):
+        """Return n initialized genomes.
+
+        Different sections of genome are initialized with a different ratio of ones and zeros
+        depending on the G_{}_initial parameter.
+        """
 
         # Initial genomes with a trait.initial fraction of 1's
         genomes = pan.rng.random(size=(n, *self.shape))
@@ -75,6 +80,7 @@ class Gstruc:
         return genomes
 
     def get_phenotype(self, genomes):
+        """Translate genomes into an array of phenotypes probabilities."""
         # Apply the environmental map
         envgenomes = self.environment(genomes)
 

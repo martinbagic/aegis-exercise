@@ -1,5 +1,8 @@
 class Trait:
-    """Genetic trait"""
+    """Genetic trait
+
+    Contains data on traits encoded in the genome.
+    """
 
     legal = ("surv", "repr", "neut", "muta")
 
@@ -28,12 +31,13 @@ class Trait:
 
         self._validate()
 
-        # Set positions in the genome
+        # Infer positions in the genome
         self.start = start
         self.end = self.start + self.length
         self.slice = slice(self.start, self.end)
 
     def _validate(self):
+        """Check whether input parameters are legal."""
         if not isinstance(self.evolvable, bool):
             raise TypeError
 
@@ -61,6 +65,7 @@ class Trait:
                 raise ValueError
 
     def __len__(self):
+        """Return number of loci used to encode the trait."""
         return self.length
 
     def __str__(self):

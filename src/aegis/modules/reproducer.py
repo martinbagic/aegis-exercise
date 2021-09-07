@@ -4,6 +4,11 @@ from aegis.panconfiguration import pan
 
 
 class Reproducer:
+    """Offspring generator
+
+    Recombines, assorts and mutates genomes of mating individuals to
+        create new genomes of their offspring."""
+
     def __init__(self, RECOMBINATION_RATE, MUTATION_RATIO, REPRODUCTION_MODE):
         self.RECOMBINATION_RATE = RECOMBINATION_RATE
         self.REPRODUCTION_MODE = REPRODUCTION_MODE
@@ -12,12 +17,27 @@ class Reproducer:
         self.rate_0to1 = MUTATION_RATIO / (1 + MUTATION_RATIO)
         self.rate_1to0 = 1 / (1 + MUTATION_RATIO)
 
+    # ================
+    # CALLING FUNCTION
+    # ================
+
+    def __call__(self, genomes, muta_prob):
+        """Exposed method"""
+
+        if self.REPRODUCTION_MODE == "sexual":
+            genomes = self._recombine(genomes)
+            genomes, _ = self._assort(genomes)
+
+        genomes = self._mutate(genomes, muta_prob)
+
+        return genomes
+
     # =============
     # RECOMBINATION
     # =============
 
     def _recombine(self, genomes):
-        """Return recombined genomes"""
+        """Return recombined chromatids."""
 
         if self.RECOMBINATION_RATE == 0:
             return genomes
@@ -63,6 +83,7 @@ class Reproducer:
     # ==========
 
     def _get_order(self, n_gametes=None, order=None):
+        """Return pairings of gametes from different parents."""
         # Extract parent indices twice, and shuffle
         if order is None:
             order = np.repeat(np.arange(n_gametes), 2)
@@ -86,7 +107,7 @@ class Reproducer:
         return order
 
     def _assort(self, genomes, order=None):
-        """Return assorted chromatids"""
+        """Return assorted chromatids."""
 
         if order is None:
             order = self._get_order(n_gametes=len(genomes))
@@ -106,6 +127,7 @@ class Reproducer:
     # ========
 
     def _mutate(self, genomes, muta_prob, random_probabilities=None):
+        """Induce germline mutations."""
 
         if random_probabilities is None:
             random_probabilities = pan.rng.random(genomes.shape)
@@ -123,17 +145,3 @@ class Reproducer:
         mutate_either = mutate_0to1 + mutate_1to0
 
         return np.logical_xor(genomes, mutate_either)
-
-    # ================
-    # CALLING FUNCTION
-    # ================
-
-    def mate(self, genomes, muta_prob):
-
-        if self.REPRODUCTION_MODE == "sexual":
-            genomes = self._recombine(genomes)
-            genomes, _ = self._assort(genomes)
-
-        genomes = self._mutate(genomes, muta_prob)
-
-        return genomes

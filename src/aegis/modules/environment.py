@@ -4,7 +4,10 @@ from aegis.panconfiguration import pan
 
 
 class Environment:
-    """Functional environmental map class"""
+    """Modifier of fitness landscape
+
+    Modifies topology of fitness landscape over time by changing the interpretation of zeros and ones in genomes.
+    """
 
     def __init__(self, gstruc_shape, ENVIRONMENT_CHANGE_RATE):
 

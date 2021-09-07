@@ -18,6 +18,7 @@ logging.basicConfig(
 
 
 def get_dhm(timediff):
+    """Format time in a human-readable format."""
     d = int(timediff / 86400)
     timediff %= 86400
     h = int(timediff / 3600)
@@ -27,6 +28,11 @@ def get_dhm(timediff):
 
 
 class Panconfiguration:
+    """Universal configuration
+
+    Contains simulation-wide parameters (parameters that affect the whole simulation and not just one ecosystem).
+    Wraps also some other useful helper functions.
+    """
     def skip(self, rate):
         """Should you skip an action performed at a certain rate"""
         return (rate <= 0) or (self.stage % rate > 0)
@@ -57,6 +63,7 @@ class Panconfiguration:
             return parser.parse_args()
 
         def get_params(custom_config_path):
+            """Fetch and validate input parameters."""
             # Read config parameters from the custom config file
             custom_config_params = read_yml(custom_config_path)
 
@@ -117,6 +124,7 @@ class Panconfiguration:
             np.savetxt(f, [content], fmt="%-10s", delimiter="| ")
 
     def _log_progress(self):
+        """Record some information about the time and speed of simulation."""
         logging.info("%8s / %s", self.stage, self.STAGES_PER_SIMULATION_)
 
         # Get time estimations
@@ -138,9 +146,9 @@ class Panconfiguration:
 
     def run_stage(self):
         """
-        1) Increments stage
-        2) Logs progress
-        3) Returns whether the simulation should continue
+        1) Increment stage
+        2) Log progress
+        3) Return whether the simulation should continue
         """
 
         # Increment stage

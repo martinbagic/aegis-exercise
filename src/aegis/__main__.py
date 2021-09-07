@@ -1,6 +1,4 @@
-"""
-This script is executed when you run `python3 -m aegis {path/to/config_file}`.
-"""
+"""This script is executed when you run `python3 -m aegis {path/to/config_file}`."""
 
 from aegis import main
 

@@ -9,7 +9,7 @@ def test_dummy():
 
 
 @pytest.mark.parametrize(
-    "PHENOMAP_SPECS,pos_end,expected",
+    "PHENOMAP_SPECS,gstruc_length,expected",
     [
         # nullify effect
         ([[0, 0, 0]], 2, [[0, 0], [0, 1]]),
@@ -24,8 +24,8 @@ def test_dummy():
         ([[0, 1, 0.42], [1, 2, -0.42]], 3, [[1, 0.42, 0], [0, 1, -0.42], [0, 0, 1]]),
     ],
 )
-def test_map_(PHENOMAP_SPECS, pos_end, expected):
-    phenomap = Phenomap(PHENOMAP_SPECS, pos_end)
+def test_map_(PHENOMAP_SPECS, gstruc_length, expected):
+    phenomap = Phenomap(PHENOMAP_SPECS, gstruc_length)
     assert np.array_equal(phenomap.map_, np.array(expected))
 
 

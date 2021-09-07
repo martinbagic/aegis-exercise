@@ -1,8 +1,12 @@
+
 import numpy as np
 
 
 class Population:
-    """Wrapper for all population data"""
+    """Population data
+    
+    Contains demographic, genetic and phenotypic data of living individuals. 
+    """
 
     attrs = (
         "genomes",
@@ -29,11 +33,11 @@ class Population:
             raise ValueError("Population attributes must have equal length")
 
     def __len__(self):
-        """Return the number of living individuals"""
+        """Return the number of living individuals."""
         return len(self.genomes)
 
     def __getitem__(self, index):
-        """Return a subpopulation"""
+        """Return a subpopulation."""
         return Population(
             genomes=self.genomes[index],
             ages=self.ages[index],
@@ -43,13 +47,13 @@ class Population:
         )
 
     def __imul__(self, index):
-        """Redefine itself as its own subpopulation"""
+        """Redefine itself as its own subpopulation."""
         for attr in self.attrs:
             setattr(self, attr, getattr(self, attr)[index])
         return self
 
     def __iadd__(self, population):
-        """Merge with another population"""
+        """Merge with another population."""
         for attr in self.attrs:
             val = np.concatenate([getattr(self, attr), getattr(population, attr)])
             setattr(self, attr, val)

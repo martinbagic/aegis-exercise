@@ -1,6 +1,4 @@
-"""
-This script is executed when this package is imported.
-"""
+"""This script is executed when this package is imported."""
 
 
 def main(custom_config_path=None):
@@ -17,3 +15,7 @@ def main(custom_config_path=None):
     while pan.run_stage():
         for ecosystem in ecosystems:
             ecosystem.run_stage()
+
+    # Record output summary
+    for ecosystem in ecosystems:
+        ecosystem.recorder.record_output_summary()
