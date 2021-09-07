@@ -1,0 +1,25 @@
+HEADSUP: 3
+DISCRETE_GENERATIONS: 100
+MATURATION_AGE: 1
+MAX_POPULATION_SIZE: 2000
+MAX_EGG_POPULATION_SIZE: 2000
+BITS_PER_LOCUS: 2
+MAX_LIFESPAN: 100
+
+GENOME_STRUCT:
+  surv: [true, binary, 0, 1, 0]
+  repr: [true, binary, 0, 1, 0]
+
+GENOME_CONST:
+  neut: 1
+  muta: 0.001
+
+REC_EVERY_NTH: 10000 # 1+ | Record every ?-th individual
+# FLUSH_RATE: 1000 # 1+ | Flush once ? individuals have been saved
+# JSON_RATE: 20000 # 1+ | Record json every ? stages
+# REC_RATE: 1000 # 1+ | Record gen, phe, dem every ? JSON flushes
+# PICKLE_RATE: 2500000 # 1+ | Pickle population every ? stages
+COUNTER_RATE: 2000 # 1+ | Record statistics every ? stages
+LOGGING_RATE: 2000 # 1+ | Log every ?-th stage
+
+CYCLE_NUM: 10000000

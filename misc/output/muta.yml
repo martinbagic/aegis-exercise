@@ -1,0 +1,9 @@
+MAX_POPULATION_SIZE: 200
+STAGES_PER_SIMULATION_: 10000
+
+G_muta_evolvable: true
+G_muta_agespecific: false
+G_muta_interpreter: exp
+G_muta_lo: 0
+G_muta_hi: 0.1
+G_muta_initial: 0.01
