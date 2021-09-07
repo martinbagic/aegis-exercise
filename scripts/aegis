@@ -1,4 +1,0 @@
-# This script is executed when you run `aegis {path/to/config_file}` in your command line.
-
-from aegis import __main__
-__main__.main()
