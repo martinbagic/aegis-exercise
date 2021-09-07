@@ -89,7 +89,6 @@ class Ecosystem:
             self.recorder.extinct = True
             return
 
-        self.recorder.record_pickle(self)
         self.recorder.record_snapshots(self.population)
         self.recorder.record_visor(self.population)
         self.recorder.record_popgenstats(self.population)
