@@ -1,5 +1,7 @@
 """This script is executed when this package is imported."""
 
+import logging
+
 
 def main(custom_config_path=None):
     from aegis.ecosystem import Ecosystem
@@ -19,3 +21,5 @@ def main(custom_config_path=None):
     # Record output summary
     for ecosystem in ecosystems:
         ecosystem.recorder.record_output_summary()
+
+    logging.info("Simulation is successfully finished")
