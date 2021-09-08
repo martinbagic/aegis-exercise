@@ -21,10 +21,10 @@ test_venv:
 	python3 -m pytest tests/ --log-cli-level=DEBUG
 
 
-# ========================================================
+# ========================================
 # TESTPYPI
-# https://test.pypi.org/project/aging-of-evolving-genomes/
-# ========================================================
+# https://test.pypi.org/project/aegis-sim/
+# ========================================
 
 # Upload build to testpypi
 upload_testpypi:
@@ -39,10 +39,10 @@ install_testpypi:
 	python3 -m pip install --index-url https://test.pypi.org/simple --extra-index-url https://pypi.org/simple aegis-sim[dev]
 
 
-# ===================================================
+# ===================================
 # (REAL) PYPI
-# https://pypi.org/project/aging-of-evolving-genomes/
-# ===================================================
+# https://pypi.org/project/aegis-sim/
+# ===================================
 
 # Upload build to pypi
 upload_pypi:
