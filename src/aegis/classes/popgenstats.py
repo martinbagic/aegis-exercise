@@ -219,6 +219,7 @@ def tajimas_d(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fa
 
 
 def theta_h(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=False):
+    """Returns Fay and Wu's estimator theta_h"""
     if REPR_MODE != "asexual":
         genomes = (
             genomes.reshape(-1, 2)
