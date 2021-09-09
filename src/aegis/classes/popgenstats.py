@@ -246,10 +246,37 @@ def theta_h(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fals
     pre_s[np.nonzero(ref)] -= sample_size
     pre_s = np.abs(pre_s)
     s = np.bincount(pre_s, minlength=sample_size + 1)[:-1]
-    h = (
+    t_h = (
         (2 * s * (np.arange(sample_size) ** 2)) / (sample_size * (sample_size - 1))
     ).sum()
-    return h
+    return t_h
+
+
+def fayandwu_h(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=False):
+    """Returns Fay and Wu's H"""
+    if REPR_MODE != "asexual":
+        genomes = (
+            genomes.reshape(-1, 2)
+            .transpose()
+            .reshape(genomes.shape[0] << 1, genomes.shape[1], -1)
+        )
+
+    if sample_size is None:
+        sample_size = genomes.shape[0]
+
+    if sample_size < 2 or genomes.shape[0] < 2:
+        return np.array([])
+
+    if sample_provided:
+        genomes_sample = genomes
+
+    else:
+        indices = sample(range(genomes.shape[0]), sample_size)
+        genomes_sample = genomes[indices, :, :]
+
+    h = theta_pi(genomes_sample) - theta_h(genomes_sample)
+    hvar = 1  # TODO: Calculate actual variance of h
+    return h / hvar
 
 
 # class PopgenStats:
