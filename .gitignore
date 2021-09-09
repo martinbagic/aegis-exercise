@@ -158,6 +158,8 @@ Thumbs.db
 
 # R files
 *.R
+*.RData
+*.Rhistory
 
 # PDF files
 *.pdf
