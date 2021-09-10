@@ -17,75 +17,75 @@ def allele_frequencies(genomes):
 
 def genotype_frequencies(genomes, REPR_MODE):
     """Output: [loc1_bit1_freq00, loc1_bit1_freq01, loc1_bit1_freq11, loc1_bit2_freq00, ...]"""
+    if REPR_MODE == "asexual":
+        return allele_frequencies(genomes)
+
     # TODO: Fetch REPR_MODE from params/panconfiguration
-    if REPR_MODE != "asexual":
-        len_pop = genomes.shape[0]
+    len_pop = genomes.shape[0]
 
-        genotypes_raw = genomes.reshape(-1, 2).sum(1).reshape(len_pop, -1).transpose()
-        genotype_freqs = (
-            np.array([np.bincount(x, minlength=3) for x in genotypes_raw]).reshape(-1)
-            / len_pop
-        )
+    genotypes_raw = genomes.reshape(-1, 2).sum(1).reshape(len_pop, -1).transpose()
+    genotype_freqs = (
+        np.array([np.bincount(x, minlength=3) for x in genotypes_raw]).reshape(-1)
+        / len_pop
+    )
 
-        return genotype_freqs
-
-    return allele_frequencies(genomes)
+    return genotype_freqs
 
 
 def mean_H_per_bit(genomes, REPR_MODE):
     """Output: [Hloc1_bit1, Hloc1_bit2, ...] Entries: (bits_per_locus // 2) * nloci"""
-    if REPR_MODE != "asexual":
-        return genotype_frequencies(genomes, REPR_MODE)[1::3]
+    if REPR_MODE == "asexual":
+        return np.array([])
 
-    return np.array([])
+    return genotype_frequencies(genomes, REPR_MODE)[1::3]
 
 
 def mean_H_per_locus(genomes, REPR_MODE):
     """Output: [Hloc1, Hloc2, ...] Entries: nloci"""
-    if REPR_MODE != "asexual":
-        H = mean_H_per_bit(genomes, REPR_MODE)
-        return H.reshape(-1, genomes.shape[2] >> 1).mean(1)
+    if REPR_MODE == "asexual":
+        return np.array([])
 
-    return np.array([])
+    H = mean_H_per_bit(genomes, REPR_MODE)
+    return H.reshape(-1, genomes.shape[2] >> 1).mean(1)
 
 
 def mean_H(genomes, REPR_MODE):
     """Output: H"""
-    if REPR_MODE != "asexual":
-        return mean_H_per_bit(genomes, REPR_MODE).mean()
+    if REPR_MODE == "asexual":
+        return np.array([])
 
-    return np.array([])
+    return mean_H_per_bit(genomes, REPR_MODE).mean()
 
 
 def mean_H_per_bit_expected(genomes, REPR_MODE):
     """Output: [Heloc1_bit1, Heloc1_bit2, ...] Entries: (bits_per_locus // 2) * nloci"""
-    if REPR_MODE != "asexual":
-        genotype_freqs_sqrd = genotype_frequencies(genomes, REPR_MODE) ** 2
-        sum_each_locus = genotype_freqs_sqrd.reshape(-1, 3).sum(1)
-        return 1 - sum_each_locus
+    if REPR_MODE == "asexual":
+        return np.array([])
 
-    return np.array([])
+    genotype_freqs_sqrd = genotype_frequencies(genomes, REPR_MODE) ** 2
+    sum_each_locus = genotype_freqs_sqrd.reshape(-1, 3).sum(1)
+    return 1 - sum_each_locus
 
 
 def mean_H_expected(genomes, REPR_MODE):
     """Output: He"""
-    if REPR_MODE != "asexual":
-        return mean_H_per_bit_expected(genomes, REPR_MODE).mean()
+    if REPR_MODE == "asexual":
+        return np.array([])
 
-    return np.array([])
+    return mean_H_per_bit_expected(genomes, REPR_MODE).mean()
 
 
 def get_mu(G_muta_initial, G_muta_evolvable, gstruc, phenotypes):
     """Return equivalent of mutation rate µ per gene per generation -> AEGIS-'Locus' interpreted as a gene"""
-    if G_muta_evolvable:
-        return np.mean(phenotypes[:, gstruc["muta"].start])
+    if not G_muta_evolvable:
+        return G_muta_initial
 
-    return G_muta_initial
+    return np.mean(phenotypes[:, gstruc["muta"].start])
 
 
 def get_theta(REPR_MODE, Ne, mu):
     """Returns the adjusted mutation rate theta = 4 * Ne * µ"""
-    ploidy_factor = 4 if REPR_MODE != "asexual" else 2
+    ploidy_factor = 2 if REPR_MODE == "asexual" else 4
     theta = ploidy_factor * Ne * mu
     return theta
 
