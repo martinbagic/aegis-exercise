@@ -1,4 +1,4 @@
-# `python3 -m pytest tests/test_popgen_mean_H_per_bit.py --log-cli-level=DEBUG`
+# `python3 -m pytest tests/test_popgen_mean_h_per_bit.py --log-cli-level=DEBUG`
 
 import pytest
 import numpy as np
@@ -105,7 +105,7 @@ example6 = np.array(
 
 
 @pytest.mark.parametrize(
-    "mean_H_per_bit_valid_input,expected",
+    "mean_h_per_bit_valid_input,expected",
     [
         (
             (example1, "asexual_diploid"),
@@ -118,6 +118,6 @@ example6 = np.array(
         ((example6, "asexual"), np.array([])),
     ],
 )
-def test_mean_H_per_bit_valid_input(mean_H_per_bit_valid_input, expected):
-    H = popgenstats.mean_H_per_bit(*mean_H_per_bit_valid_input)
-    assert pytest.approx(H, 0.0001) == expected
+def test_mean_h_per_bit_valid_input(mean_h_per_bit_valid_input, expected):
+    h = popgenstats.mean_h_per_bit(*mean_h_per_bit_valid_input)
+    assert pytest.approx(h, 0.0001) == expected
