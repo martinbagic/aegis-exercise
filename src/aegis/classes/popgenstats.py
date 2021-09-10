@@ -1,7 +1,5 @@
-from statistics import harmonic_mean
-from random import sample
-from itertools import combinations
-from math import sqrt, comb
+import statistics
+import itertools
 import numpy as np
 
 
@@ -10,7 +8,7 @@ def get_N(pop_size_history):
 
 
 def get_Ne(pop_size_history):
-    return harmonic_mean(pop_size_history)
+    return statistics.harmonic_mean(pop_size_history)
 
 
 def allele_frequencies(genomes):
@@ -140,7 +138,7 @@ def theta_w(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fals
         genomes_sample = genomes
 
     else:
-        indices = sample(range(genomes.shape[0]), sample_size)
+        indices = np.random.choice(range(genomes.shape[0]), sample_size, replace=False)
         genomes_sample = genomes[indices, :, :]
 
     s = segregating_sites(genomes_sample)
@@ -166,10 +164,10 @@ def theta_pi(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fal
         genomes_sample = genomes
 
     else:
-        indices = sample(range(genomes.shape[0]), sample_size)
+        indices = np.random.choice(range(genomes.shape[0]), sample_size, replace=False)
         genomes_sample = genomes[indices, :, :]
 
-    combs = combinations(range(sample_size), 2)
+    combs = itertools.combinations(range(sample_size), 2)
     tmp = genomes_sample.reshape(sample_size, -1)
     diffs = np.array([(tmp[i[0]] != tmp[i[1]]).sum() for i in combs])
     total_diffs = diffs.sum()
@@ -197,7 +195,7 @@ def tajimas_d(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fa
         genomes_sample = genomes
 
     else:
-        indices = sample(range(genomes.shape[0]), sample_size)
+        indices = np.random.choice(range(genomes.shape[0]), sample_size, replace=False)
         genomes_sample = genomes[indices, :, :]
 
     d = theta_pi(genomes_sample) - theta_w(genomes_sample)
@@ -213,7 +211,7 @@ def tajimas_d(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fa
     c2 = b2 - ((sample_size + 2) / (a1 * sample_size)) + (a2 / (a1 ** 2))
     e1 = c1 / a1
     e2 = c2 / ((a1 ** 2) + a2)
-    dvar = sqrt((e1 * s) + (e2 * s * (s - 1)))
+    dvar = ((e1 * s) + (e2 * s * (s - 1))) ** 0.5
 
     return d / dvar
 
@@ -237,7 +235,7 @@ def theta_h(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=Fals
         genomes_sample = genomes
 
     else:
-        indices = sample(range(genomes.shape[0]), sample_size)
+        indices = np.random.choice(range(genomes.shape[0]), sample_size, replace=False)
         genomes_sample = genomes[indices, :, :]
 
     # sum from i=1 to i=n-1: ( (2 * S_i * i^2) / (n * (n-1)) )
@@ -271,7 +269,7 @@ def fayandwu_h(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=F
         genomes_sample = genomes
 
     else:
-        indices = sample(range(genomes.shape[0]), sample_size)
+        indices = np.random.choice(range(genomes.shape[0]), sample_size, replace=False)
         genomes_sample = genomes[indices, :, :]
 
     h = theta_pi(genomes_sample) - theta_h(genomes_sample)
@@ -283,12 +281,10 @@ def fayandwu_h(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=F
 #     def __init__(self):
 #         return
 #
-#     def test(self, gstruc, population):
-#         return (
-#             np.mean(population.phenotypes[:, gstruc["muta"].start]),
-#             statistics.geometric_mean(population.phenotypes[:, gstruc["muta"].start]),
-#             np.median(population.phenotypes[:, gstruc["muta"].start])
-#         )
+#     def analyze(self, population):
+#         return population.genomes.reshape(-1)
+
+
 #
 
 # class PopgenStats:
@@ -302,6 +298,6 @@ def fayandwu_h(genomes, sample_size=None, REPR_MODE="asexual", sample_provided=F
 #             return population.pop_size_history[-1]
 
 #         def pop_size_effective():
-#             return harmonic_mean(population.pop_size_history)
+#             return statistics.harmonic_mean(population.pop_size_history)
 
 #         return (pop_size(), pop_size_effective())
