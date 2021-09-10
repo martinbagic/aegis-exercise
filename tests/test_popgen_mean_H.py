@@ -114,8 +114,8 @@ example6 = np.array(
         ((example2, "sexual"), 0.5),
         ((example3, "asexual_diploid"), 0.25),
         ((example4, "sexual"), 0),
-        ((example5, "asexual"), np.array([])),
-        ((example6, "asexual"), np.array([])),
+        ((example5, "asexual"), None),
+        ((example6, "asexual"), None),
     ],
 )
 def test_mean_h_valid_input(mean_h_valid_input, expected):
