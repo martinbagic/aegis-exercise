@@ -17,6 +17,7 @@ def get_ne(pop_size_history):
 
 def allele_frequencies(genomes):
     """Returns the frequency of the 1-allele at every position of the genome"""
+    # Aligns the genomes of the population, disregarding chromosomes, and takes the mean
     return genomes.reshape(genomes.shape[0], -1).mean(0)
 
 
@@ -28,7 +29,10 @@ def genotype_frequencies(genomes, repr_mode):
     # TODO: Fetch repr_mode from params/panconfiguration
     len_pop = genomes.shape[0]
 
+    # Genotype = Sum of alleles at a position -> [0, 1, 2]
     genotypes_raw = genomes.reshape(-1, 2).sum(1).reshape(len_pop, -1).transpose()
+
+    # Counts the frequencies of 0, 1 and 2 across the population
     genotype_freqs = (
         np.array([np.bincount(x, minlength=3) for x in genotypes_raw]).reshape(-1)
         / len_pop
@@ -109,6 +113,8 @@ def reference_genome(genomes):
 
 def segregating_sites(genomes, repr_mode="asexual"):
     """Returns the number of segregating sites"""
+    # Genomes are first aligned and summed at each site across the population
+    # A site is segregating if its sum is not equal to either 0 or the population size N
     if repr_mode == "asexual":
         pre_segr_sites = genomes.reshape(genomes.shape[0], -1).sum(0)
         segr_sites = genomes.shape[1] * genomes.shape[2] - (
@@ -138,6 +144,16 @@ def harmonic_sq(i):
 def theta_w(genomes, sample_size=None, repr_mode="asexual", sample_provided=False):
     """Returns Watterson's estimator theta_w"""
     if repr_mode != "asexual":
+        # The chromosomes get aligned
+        # 3D (individuals, loci, bits): [1, 2, 1, 2, 1, 2, 1, 2, 3, 4, 3, 4, 3, 4, 3, 4] ->
+        #
+        # 2D (everything, 2): [[1, 1, 1, 1, 3, 3, 3, 3],
+        #                      [2, 2, 2, 2, 4, 4, 4, 4]] ->
+        #
+        # 3D (chromosomes, loci, bits // 2): [[1, 1, 1, 1],
+        #    (individuals * 2, ...)           [2, 2, 2, 2],
+        #                                     [3, 3, 3, 3],
+        #                                     [4, 4, 4, 4]]
         genomes = (
             genomes.reshape(-1, 2)
             .transpose()
@@ -164,6 +180,16 @@ def theta_w(genomes, sample_size=None, repr_mode="asexual", sample_provided=Fals
 def theta_pi(genomes, sample_size=None, repr_mode="asexual", sample_provided=False):
     """Returns the estimator theta_pi (based on pairwise differences)"""
     if repr_mode != "asexual":
+        # The chromosomes get aligned
+        # 3D (individuals, loci, bits): [1, 2, 1, 2, 1, 2, 1, 2, 3, 4, 3, 4, 3, 4, 3, 4] ->
+        #
+        # 2D (everything, 2): [[1, 1, 1, 1, 3, 3, 3, 3],
+        #                      [2, 2, 2, 2, 4, 4, 4, 4]] ->
+        #
+        # 3D (chromosomes, loci, bits // 2): [[1, 1, 1, 1],
+        #    (individuals * 2, ...)           [2, 2, 2, 2],
+        #                                     [3, 3, 3, 3],
+        #                                     [4, 4, 4, 4]]
         genomes = (
             genomes.reshape(-1, 2)
             .transpose()
@@ -184,6 +210,8 @@ def theta_pi(genomes, sample_size=None, repr_mode="asexual", sample_provided=Fal
         genomes_sample = genomes[indices, :, :]
 
     combs = itertools.combinations(range(sample_size), 2)
+
+    # Aligns chromosomes and count pairwise differences
     genomes_sample_flat = genomes_sample.reshape(sample_size, -1)
     diffs = np.array(
         [(genomes_sample_flat[i[0]] != genomes_sample_flat[i[1]]).sum() for i in combs]
@@ -197,6 +225,16 @@ def theta_pi(genomes, sample_size=None, repr_mode="asexual", sample_provided=Fal
 def tajimas_d(genomes, sample_size=None, repr_mode="asexual", sample_provided=False):
     """Returns Tajima's D"""
     if repr_mode != "asexual":
+        # The chromosomes get aligned
+        # 3D (individuals, loci, bits): [1, 2, 1, 2, 1, 2, 1, 2, 3, 4, 3, 4, 3, 4, 3, 4] ->
+        #
+        # 2D (everything, 2): [[1, 1, 1, 1, 3, 3, 3, 3],
+        #                      [2, 2, 2, 2, 4, 4, 4, 4]] ->
+        #
+        # 3D (chromosomes, loci, bits // 2): [[1, 1, 1, 1],
+        #    (individuals * 2, ...)           [2, 2, 2, 2],
+        #                                     [3, 3, 3, 3],
+        #                                     [4, 4, 4, 4]]
         genomes = (
             genomes.reshape(-1, 2)
             .transpose()
@@ -237,6 +275,16 @@ def tajimas_d(genomes, sample_size=None, repr_mode="asexual", sample_provided=Fa
 def theta_h(genomes, sample_size=None, repr_mode="asexual", sample_provided=False):
     """Returns Fay and Wu's estimator theta_h"""
     if repr_mode != "asexual":
+        # The chromosomes get aligned
+        # 3D (individuals, loci, bits): [1, 2, 1, 2, 1, 2, 1, 2, 3, 4, 3, 4, 3, 4, 3, 4] ->
+        #
+        # 2D (everything, 2): [[1, 1, 1, 1, 3, 3, 3, 3],
+        #                      [2, 2, 2, 2, 4, 4, 4, 4]] ->
+        #
+        # 3D (chromosomes, loci, bits // 2): [[1, 1, 1, 1],
+        #    (individuals * 2, ...)           [2, 2, 2, 2],
+        #                                     [3, 3, 3, 3],
+        #                                     [4, 4, 4, 4]]
         genomes = (
             genomes.reshape(-1, 2)
             .transpose()
@@ -271,6 +319,16 @@ def theta_h(genomes, sample_size=None, repr_mode="asexual", sample_provided=Fals
 def fayandwu_h(genomes, sample_size=None, repr_mode="asexual", sample_provided=False):
     """Returns Fay and Wu's H"""
     if repr_mode != "asexual":
+        # The chromosomes get aligned
+        # 3D (individuals, loci, bits): [1, 2, 1, 2, 1, 2, 1, 2, 3, 4, 3, 4, 3, 4, 3, 4] ->
+        #
+        # 2D (everything, 2): [[1, 1, 1, 1, 3, 3, 3, 3],
+        #                      [2, 2, 2, 2, 4, 4, 4, 4]] ->
+        #
+        # 3D (chromosomes, loci, bits // 2): [[1, 1, 1, 1],
+        #    (individuals * 2, ...)           [2, 2, 2, 2],
+        #                                     [3, 3, 3, 3],
+        #                                     [4, 4, 4, 4]]
         genomes = (
             genomes.reshape(-1, 2)
             .transpose()
