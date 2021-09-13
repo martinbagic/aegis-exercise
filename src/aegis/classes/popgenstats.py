@@ -45,7 +45,7 @@ def mean_h_per_bit(genomes, repr_mode):
     """Returns the mean heterozygosity per bit.
     Output: [Hloc1_bit1, Hloc1_bit2, ...] Entries: (bits_per_locus // 2) * nloci"""
     if repr_mode == "asexual":
-        return 
+        return None
 
     return genotype_frequencies(genomes, repr_mode)[1::3]
 
@@ -54,7 +54,7 @@ def mean_h_per_locus(genomes, repr_mode):
     """Returns the mean heterozygosity per locus.
     Output: [Hloc1, Hloc2, ...] Entries: nloci"""
     if repr_mode == "asexual":
-        return 
+        return None
 
     h_per_bit = mean_h_per_bit(genomes, repr_mode)
     return h_per_bit.reshape(-1, genomes.shape[2] >> 1).mean(1)
@@ -64,7 +64,7 @@ def mean_h(genomes, repr_mode):
     """Returns the mean heterozygosity of a population.
     Output: H"""
     if repr_mode == "asexual":
-        return 
+        return None
 
     return mean_h_per_bit(genomes, repr_mode).mean()
 
@@ -73,7 +73,7 @@ def mean_h_per_bit_expected(genomes, repr_mode):
     """Returns the expected mean heterozygosity per bit under Hardy-Weinberg-Equilibrium.
     Output: [Heloc1_bit1, Heloc1_bit2, ...] Entries: (bits_per_locus // 2) * nloci"""
     if repr_mode == "asexual":
-        return 
+        return None
 
     genotype_freqs_sqrd = genotype_frequencies(genomes, repr_mode) ** 2
     sum_each_locus = genotype_freqs_sqrd.reshape(-1, 3).sum(1)
@@ -84,7 +84,7 @@ def mean_h_expected(genomes, repr_mode):
     """Returns the expected mean heterozygosity per bit under Hardy-Weinberg-Equilibrium.
     Output: He"""
     if repr_mode == "asexual":
-        return 
+        return None
 
     return mean_h_per_bit_expected(genomes, repr_mode).mean()
 
@@ -164,7 +164,7 @@ def theta_w(genomes, sample_size=None, repr_mode="asexual", sample_provided=Fals
         sample_size = genomes.shape[0]
 
     if sample_size < 2 or genomes.shape[0] < 2:
-        return 
+        return None
 
     if sample_provided:
         genomes_sample = genomes
@@ -200,7 +200,7 @@ def theta_pi(genomes, sample_size=None, repr_mode="asexual", sample_provided=Fal
         sample_size = genomes.shape[0]
 
     if sample_size < 2 or genomes.shape[0] < 2:
-        return 
+        return None
 
     if sample_provided:
         genomes_sample = genomes
@@ -245,7 +245,7 @@ def tajimas_d(genomes, sample_size=None, repr_mode="asexual", sample_provided=Fa
         sample_size = genomes.shape[0]
 
     if sample_size < 3 or genomes.shape[0] < 3:
-        return 
+        return None
 
     if sample_provided:
         genomes_sample = genomes
@@ -295,7 +295,7 @@ def theta_h(genomes, sample_size=None, repr_mode="asexual", sample_provided=Fals
         sample_size = genomes.shape[0]
 
     if sample_size < 2 or genomes.shape[0] < 2:
-        return 
+        return None
 
     if sample_provided:
         genomes_sample = genomes
@@ -339,7 +339,7 @@ def fayandwu_h(genomes, sample_size=None, repr_mode="asexual", sample_provided=F
         sample_size = genomes.shape[0]
 
     if sample_size < 2 or genomes.shape[0] < 2:
-        return 
+        return None
 
     if sample_provided:
         genomes_sample = genomes
@@ -355,7 +355,7 @@ def fayandwu_h(genomes, sample_size=None, repr_mode="asexual", sample_provided=F
 
 # class PopgenStats:
 #     def __init__(self):
-#         return
+#         return None
 #
 #     def analyze(self, population):
 #         return population.genomes.reshape(-1)
