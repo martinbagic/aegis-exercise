@@ -272,6 +272,46 @@ def tajimas_d(genomes, sample_size=None, repr_mode="asexual", sample_provided=Fa
     return pre_d / d_stdev
 
 
+def get_sfs(genomes, sample_size=None, repr_mode="asexual", sample_provided=False):
+    """Returns the site frequency spectrum (allele frequency spectrum) of a sample"""
+    if repr_mode != "asexual":
+        # The chromosomes get aligned
+        # 3D (individuals, loci, bits): [1, 2, 1, 2, 1, 2, 1, 2, 3, 4, 3, 4, 3, 4, 3, 4] ->
+        #
+        # 2D (everything, 2): [[1, 1, 1, 1, 3, 3, 3, 3],
+        #                      [2, 2, 2, 2, 4, 4, 4, 4]] ->
+        #
+        # 3D (chromosomes, loci, bits // 2): [[1, 1, 1, 1],
+        #    (individuals * 2, ...)           [2, 2, 2, 2],
+        #                                     [3, 3, 3, 3],
+        #                                     [4, 4, 4, 4]]
+        genomes = (
+            genomes.reshape(-1, 2)
+            .transpose()
+            .reshape(genomes.shape[0] << 1, genomes.shape[1], -1)
+        )
+
+    if sample_size is None:
+        sample_size = genomes.shape[0]
+
+    if sample_size < 2 or genomes.shape[0] < 2:
+        return None
+
+    if sample_provided:
+        genomes_sample = genomes
+
+    else:
+        indices = np.random.choice(range(genomes.shape[0]), sample_size, replace=False)
+        genomes_sample = genomes[indices, :, :]
+
+    ref = reference_genome(genomes)
+    pre_sfs = genomes_sample.reshape(genomes_sample.shape[0], -1).sum(0)
+    pre_sfs[np.nonzero(ref)] -= sample_size
+    pre_sfs = np.abs(pre_sfs)
+    sfs = np.bincount(pre_sfs, minlength=sample_size + 1)[:-1]
+    return sfs
+
+
 def theta_h(genomes, sample_size=None, repr_mode="asexual", sample_provided=False):
     """Returns Fay and Wu's estimator theta_h"""
     if repr_mode != "asexual":
@@ -305,11 +345,7 @@ def theta_h(genomes, sample_size=None, repr_mode="asexual", sample_provided=Fals
         genomes_sample = genomes[indices, :, :]
 
     # sum from i=1 to i=n-1: ( (2 * S_i * i^2) / (n * (n-1)) )
-    ref = reference_genome(genomes)
-    pre_sfs = genomes_sample.reshape(genomes_sample.shape[0], -1).sum(0)
-    pre_sfs[np.nonzero(ref)] -= sample_size
-    pre_sfs = np.abs(pre_sfs)
-    sfs = np.bincount(pre_sfs, minlength=sample_size + 1)[:-1]
+    sfs = get_sfs(genomes_sample)
     t_h = (
         (2 * sfs * (np.arange(sample_size) ** 2)) / (sample_size * (sample_size - 1))
     ).sum()
