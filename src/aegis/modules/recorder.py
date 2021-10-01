@@ -3,6 +3,7 @@ import numpy as np
 import json
 import time
 import copy
+import pickle
 
 from aegis.panconfiguration import pan
 from aegis.modules.popgenstats import PopgenStats
@@ -29,6 +30,7 @@ class Recorder:
             "snapshots_demography": opath / "snapshots" / "demography",
             "visor": opath / "visor",
             "visor_spectra": opath / "visor" / "spectra",
+            "pickles": opath / "pickles",
             "output_summary": opath,
         }
         for path in self.paths.values():
@@ -51,9 +53,24 @@ class Recorder:
         # PopgenStats
         self.popgenstats = PopgenStats()
 
+        # Needed for record_pickle
+        self.pickle_id = 0
+
     # ===============================
     # RECORDING METHOD I. (snapshots)
     # ===============================
+
+    def record_pickle(self, ecosystem):
+        if pan.skip(pan.PICKLE_RATE_):
+            return
+
+        with open(self.paths["pickles"] / f"{self.pickle_id}.pickle", "wb") as f:
+            pickle.dump(ecosystem, f)
+
+        self.pickle_id += 1
+
+        # Reset origin id's
+        ecosystem.population.origins = np.arange(len(ecosystem.population))
 
     def record_visor(self, population):
         """Record data that is needed by visor."""

@@ -74,8 +74,11 @@ class Ecosystem:
             births = np.zeros(num, int)
             birthdays = np.zeros(num, int)
             phenotypes = self.gstruc.get_phenotype(genomes)
+            origins = np.arange(num)
 
-            self.population = Population(genomes, ages, births, birthdays, phenotypes)
+            self.population = Population(
+                genomes, ages, births, birthdays, phenotypes, origins
+            )
 
     ##############
     # MAIN LOGIC #
@@ -93,6 +96,7 @@ class Ecosystem:
         self.recorder.record_visor(self.population)
         self.recorder.record_popgenstats(self.population)
         self.recorder.collect("cumulative_ages", self.population.ages)
+        self.recorder.record_pickle(self)
 
         if len(self.population):  # no living individuals
             self.eco_survival()
@@ -169,6 +173,9 @@ class Ecosystem:
         muta_prob = self._get_evaluation("muta", part=mask_repr)[mask_repr]
         genomes = self.reproducer(parents, muta_prob)
 
+        # Get origins
+        origins = self.population.origins[mask_repr]
+
         # Get eggs
         n = len(genomes)
         eggs = Population(
@@ -177,6 +184,7 @@ class Ecosystem:
             births=np.zeros(n, int),
             birthdays=np.zeros(n, int) + pan.stage,
             phenotypes=self.gstruc.get_phenotype(genomes),
+            origins=origins,
         )
 
         if self.eggs is None:

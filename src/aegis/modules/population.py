@@ -1,36 +1,31 @@
-
 import numpy as np
 
 
 class Population:
     """Population data
-    
-    Contains demographic, genetic and phenotypic data of living individuals. 
+
+    Contains demographic, genetic and phenotypic data of living individuals.
     """
 
-    attrs = (
-        "genomes",
-        "ages",
-        "births",
-        "birthdays",
-        "phenotypes",
-    )
+    attrs = ("genomes", "ages", "births", "birthdays", "phenotypes", "origins")
 
-    def __init__(self, genomes, ages, births, birthdays, phenotypes):
-        self.genomes = genomes
-        self.ages = ages
-        self.births = births
-        self.birthdays = birthdays
-        self.phenotypes = phenotypes
-
+    def __init__(self, genomes, ages, births, birthdays, phenotypes, origins):
         if not (
             len(genomes)
             == len(ages)
             == len(births)
             == len(birthdays)
             == len(phenotypes)
+            == len(origins)
         ):
             raise ValueError("Population attributes must have equal length")
+
+        self.genomes = genomes
+        self.ages = ages
+        self.births = births
+        self.birthdays = birthdays
+        self.phenotypes = phenotypes
+        self.origins = origins
 
     def __len__(self):
         """Return the number of living individuals."""
@@ -44,6 +39,7 @@ class Population:
             births=self.births[index],
             birthdays=self.birthdays[index],
             phenotypes=self.phenotypes[index],
+            origins=self.origins[index],
         )
 
     def __imul__(self, index):

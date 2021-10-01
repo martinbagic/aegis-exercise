@@ -33,6 +33,7 @@ class Panconfiguration:
     Contains simulation-wide parameters (parameters that affect the whole simulation and not just one ecosystem).
     Wraps also some other useful helper functions.
     """
+
     def skip(self, rate):
         """Should you skip an action performed at a certain rate"""
         return (rate <= 0) or (self.stage % rate > 0)
@@ -98,7 +99,7 @@ class Panconfiguration:
         self.ECOSYSTEM_NUMBER_ = params["ECOSYSTEM_NUMBER_"]
         self.STAGES_PER_SIMULATION_ = params["STAGES_PER_SIMULATION_"]
         self.LOGGING_RATE_ = params["LOGGING_RATE_"]
-        # self.PICKLE_RATE_ = params["PICKLE_RATE_"]
+        self.PICKLE_RATE_ = params["PICKLE_RATE_"]
         self.SNAPSHOT_RATE_ = params["SNAPSHOT_RATE_"]
         self.VISOR_RATE_ = params["VISOR_RATE_"]
         self.POPGENSTATS_RATE_ = params["POPGENSTATS_RATE_"]
